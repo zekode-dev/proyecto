@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${p.nombre} + ' - Tienda Urbana'"></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: #fff;
+            color: #111;
+            overflow-x: hidden;
+        }
+        a { text-decoration: none; color: inherit; }
+
+        /* NAVBAR */
+        .navbar-custom {
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            padding: 14px 0;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+        .logo-img {
+            max-height: 60px;
+            width: auto;
+            object-fit: contain;
+        }
+        .nav-link {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin: 0 12px;
+            position: relative;
+        }
+        .carrito-menu-contenedor {
+            position: relative;
+            display: inline-block;
+            font-size: 20px;
+            color: #111;
+            cursor: pointer;
+        }
+        .carrito-contador-burbuja {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background: #111;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* GALERÍA DE DETALLE */
+        .img-principal-contenedor {
+            width: 100%;
+            height: 600px;
+            background: #fcfcfc;
+            border: 1px solid #f1f1f1;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .img-principal { width: 100%; height: 100%; object-fit: contain; padding: 15px; }
+        .miniaturas-wrapper { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .img-miniatura { width: 80px; height: 80px; object-fit: contain; cursor: pointer; border: 1px solid #eee; padding: 5px; }
+        .img-miniatura.active { border-color: #111; }
+
+        /* INFO DETALLE */
+        .detalle-titulo { font-size: 32px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .detalle-categoria { font-size: 12px; font-weight: 600; text-transform: uppercase; color: #777; letter-spacing: 2px; }
+        .detalle-precio { font-size: 24px; font-weight: 700; margin-bottom: 25px; }
+        .detalle-descripcion { font-size: 14px; line-height: 1.8; color: #444; margin-bottom: 30px; }
+        .selector-label { font-size: 11px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .select-urbano { border: 1px solid #111; border-radius: 0; font-size: 13px; box-shadow: none !important; }
+
+        .btn-agregar-carrito, .btn-finalizar {
+            background: #111; color: #fff; border: 1px solid #111; border-radius: 0;
+            padding: 15px; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; width: 100%;
+        }
+        .btn-agregar-carrito:hover, .btn-finalizar:hover { background: #fff; color: #111; }
+        .btn-volver { font-size: 12px; font-weight: 600; text-transform: uppercase; color: #777; margin-bottom: 30px; display: inline-block; }
+
+        /* ========================================= */
+        /* CARRITO FLOTANTE LATERAL (SLIDE OUT)      */
+        /* ========================================= */
+        .carrito-sidebar {
+            position: fixed;
+            top: 0;
+            right: -450px;
+            width: 420px;
+            max-width: 100%;
+            height: 100vh;
+            background: #fff;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.15);
+            z-index: 1050;
+            transition: right 0.4s ease-in-out;
+            display: flex;
+            flex-direction: column;
+        }
+        .carrito-sidebar.active {
+            right: 0;
+        }
+        .carrito-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.4);
+            z-index: 1040;
+            display: none;
+        }
+        .carrito-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .carrito-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .carrito-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            background: #fbfbfb;
+        }
+        .item-carrito-lateral {
+            display: flex;
+            gap: 15px;
+            padding: 15px 0;
+            border-bottom: 1px solid #f1f1f1;
+            align-items: center;
+        }
+        .img-cart-lat {
+            width: 60px;
+            height: 70px;
+            object-fit: contain;
+            background: #fafafa;
+            border: 1px solid #eee;
+        }
+        .btn-cant-lat {
+            border: 1px solid #111;
+            background: transparent;
+            width: 24px;
+            height: 24px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .input-urbano {
+            border: 1px solid #111;
+            border-radius: 0;
+            font-size: 12px;
+            padding: 8px;
+            box-shadow: none !important;
+        }
+
+        /* ESTILO PARA BOX DE PAGO YAPE/PLIN */
+        .box-pago-digital {
+            background-color: #f3e8ff;
+            border: 1px dashed #6f42c1;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="carrito-overlay" id="cartOverlay" onclick="toggleCarritoLateral()"></div>
+
+<div class="carrito-sidebar" id="cartSidebar">
+    <div class="carrito-header">
+        <h5 class="m-0 fw-800 text-uppercase" style="font-size: 16px; font-weight:800;">Mi Bolsa de Compras</h5>
+        <button class="btn-close" onclick="toggleCarritoLateral()"></button>
+    </div>
+
+    <div class="carrito-body" id="cartBodyContainer">
+    </div>
+
+    <div class="carrito-footer" id="cartFooterSection">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="fw-bold text-uppercase" style="font-size:12px;">Total Estimado:</span>
+            <span class="fw-bold" style="font-size:18px;" id="totalLateralTexto">S/ 0.00</span>
+        </div>
+
+        <div id="alertaMonto" class="alert alert-warning py-1 px-2 d-none" style="font-size:11px;">
+            <i class="bi bi-exclamation-triangle-fill"></i> Máximo S/ 500 para Yape/Plin.
+        </div>
+
+        <div class="mb-2">
+            <input type="text" id="latCelular" class="form-control input-urbano" placeholder="Tu DNI (8 dígitos)" maxlength="8">
+        </div>
+        <div class="mb-2">
+            <input type="text" id="latNombre" class="form-control input-urbano" placeholder="Nombres">
+        </div>
+        <div class="row g-2 mb-2">
+            <div class="col-6">
+                <input type="text" id="latApellidoPaterno" class="form-control input-urbano" placeholder="Apellido Paterno">
+            </div>
+            <div class="col-6">
+                <input type="text" id="latApellidoMaterno" class="form-control input-urbano" placeholder="Apellido Materno">
+            </div>
+        </div>
+
+        <div class="mb-2">
+            <label class="selector-label" style="font-size:10px;">Forma de Pago</label>
+            <select id="latTipoPago" class="form-select select-urbano" onchange="alternarTipoPago()">
+                <option value="CONTADO">CONTADO</option>
+                <option value="CREDITO">CRÉDITO (INTERNO)</option>
+            </select>
+        </div>
+
+        <div id="seccionCreditoOptions" class="mb-2 d-none p-2 border bg-light">
+            <div class="row g-2">
+                <div class="col-6">
+                    <label class="selector-label" style="font-size:10px;">N° Cuotas</label>
+                    <input type="number" id="latCuotas" class="form-control input-urbano" value="1" min="1" oninput="calcularMontoCuotaDinamico()">
+                </div>
+                <div class="col-6">
+                    <label class="selector-label" style="font-size:10px;">1er Vencimiento</label>
+                    <input type="date" id="latFechaPrimerVencimiento" class="form-control input-urbano">
+                </div>
+            </div>
+            <div class="mt-2 text-end" style="font-size: 11px; font-weight: 700; text-transform: uppercase;">
+                Monto Cuota: <span id="lblSubprecioMensual" style="color: #111;">S/ 0.00</span>
+            </div>
+        </div>
+
+        <!-- 🌟 BOX EXCLUSIVO YAPE / PLIN CON NÚMERO DE TRANSFERENCIA -->
+        <div id="boxYapePlinInfo" class="box-pago-digital text-center">
+            <div class="d-flex align-items-center justify-content-center gap-2" style="color: #6f42c1; font-weight: 700; font-size: 12px; text-transform: uppercase;">
+                <i class="bi bi-wallet2"></i> Pago rápido Yape / Plin
+            </div>
+            <div class="mt-1 fw-bold" style="font-size: 15px; color: #111; letter-spacing: 0.5px;">
+                919 660 485 <cite class="d-none"></cite>
+            </div>
+            <div class="text-muted" style="font-size: 10px; margin-top: 2px;">
+                Realiza la transferencia y registra abajo el número de operación.
+            </div>
+        </div>
+
+        <div class="mb-3" id="wrapperMediosPago">
+            <label class="selector-label" style="font-size:10px;">Selecciona Medio de Pago</label>
+            <div class="d-flex gap-1 flex-wrap" id="contenedorMediosPago">
+                <button type="button" id="btnMedioTARJETA" class="btn btn-sm btn-dark text-white" style="font-size:11px; font-weight:600;" onclick="seleccionarMedio('TARJETA')">TARJETA</button>
+                <button type="button" id="btnMedioYAPE" class="btn btn-sm btn-outline-dark" style="font-size:11px; font-weight:600;" onclick="seleccionarMedio('YAPE')">YAPE</button>
+                <button type="button" id="btnMedioPLIN" class="btn btn-sm btn-outline-dark" style="font-size:11px; font-weight:600;" onclick="seleccionarMedio('PLIN')">PLIN</button>
+                <button type="button" id="btnMedioTRANSFERENCIA" class="btn btn-sm btn-outline-dark" style="font-size:11px; font-weight:600;" onclick="seleccionarMedio('TRANSFERENCIA')">TRANSF.</button>
+            </div>
+        </div>
+
+        <div class="mb-3" id="wrapperCodigoOperacion">
+            <input type="text" id="latCodigoOperacion" class="form-control input-urbano" placeholder="Número de Operación / Referencia">
+        </div>
+
+        <button class="btn btn-finalizar" onclick="enviarPedidoBackend()">Procesar Compra Web</button>
+    </div>
+</div>
+
+<nav class="navbar navbar-expand-lg navbar-light navbar-custom">
+    <div class="container">
+        <a class="navbar-brand logo d-flex align-items-center" href="/web">
+            <img th:if="${logoActivo != null}" th:src="${logoActivo.imagen}" alt="Logo" class="logo-img">
+        </a>
+        <div class="collapse navbar-collapse" id="menu">
+            <ul class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link" href="/web">Inicio</a></li>
+                <li class="nav-item"><a class="nav-link" href="/web#tienda">Tienda</a></li>
+                <li class="nav-item"><a class="nav-link" href="/web#coleccion">Colección</a></li>
+            </ul>
+        </div>
+        <div class="d-flex align-items-center">
+            <div class="carrito-menu-contenedor" onclick="toggleCarritoLateral()" title="Ver mi bolsa">
+                <i class="bi bi-bag"></i>
+                <span id="contadorCarrito" class="carrito-contador-burbuja">0</span>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <a href="/web#tienda" class="btn-volver">← Volver a la tienda</a>
+
+    <div class="row g-5">
+        <div class="col-12 col-lg-7">
+            <div class="img-principal-contenedor">
+                <img id="fotoGrande" th:src="${#strings.arraySplit(p.imagen, ',')[0]}" class="img-principal" alt="Producto">
+            </div>
+            <div class="miniaturas-wrapper" th:if="${p.imagen != null}">
+                <img th:each="imgUrl, iter : ${#strings.arraySplit(p.imagen, ',')}" th:src="${imgUrl}" class="img-miniatura" th:classappend="${iter.index == 0} ? 'active'" onclick="cambiarFoto(this)">
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <div class="detalle-categoria" th:text="${p.categoria.nombre}">Categoría</div>
+            <h1 class="detalle-titulo" th:text="${p.nombre}">Nombre del Producto</h1>
+            <div class="detalle-precio" th:text="'S/ ' + ${p.precio}">S/ 0.00</div>
+
+            <hr style="border-color: #eee; margin: 25px 0;">
+            <p class="detalle-descripcion" th:text="${p.descripcion}">Descripción...</p>
+
+            <div class="row g-3">
+                <div class="col-6">
+                    <label class="selector-label">Seleccionar Talla</label>
+                    <select class="form-select select-urbano" id="detalleTalla" onchange="actualizarIndicadorStock()">
+                        <option th:each="d : ${p.detalles}" th:if="${d.estado == 1 and d.stock > 0}" th:value="${d.talla}" th:text="${d.talla}"></option>
+                    </select>
+                </div>
+                <div class="col-6">
+                    <label class="selector-label">Seleccionar Color</label>
+                    <select class="form-select select-urbano" id="detalleColor" onchange="actualizarIndicadorStock()">
+                        <option th:each="d : ${p.detalles}" th:if="${d.estado == 1 and d.stock > 0}" th:value="${d.color}" th:text="${#strings.toUpperCase(d.color)}"></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="mt-4" id="contenedorStock" style="font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                <span id="txtStockStatus"></span>
+            </div>
+
+            <button class="btn btn-agregar-carrito mt-4">Añadir al Carrito</button>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script th:inline="javascript">
+    let medioPagoSeleccionado = "TARJETA";
+
+    function cambiarFoto(element) {
+        document.getElementById("fotoGrande").src = element.src;
+        document.querySelectorAll(".img-miniatura").forEach(img => img.classList.remove("active"));
+        element.classList.add("active");
+    }
+
+    /*<![CDATA[*/
+    const listaVariantesCompleta = /*[[${p.detalles}]]*/ [];
+    const idProductoMaestro = /*[[${p.idProducto}]]*/ 0;
+    const nombreProductoMaestro = /*[[${p.nombre}]]*/ "Producto";
+    const precioProductoMaestro = parseFloat(/*[[${p.precio}]]*/ 0);
+    /*]]>*/
+
+    document.addEventListener("DOMContentLoaded", function() {
+        actualizarNumeroBurbuja();
+        actualizarIndicadorStock();
+        renderizarContenidoLateral();
+
+        let hoy = new Date().toISOString().split('T')[0];
+        let inputFecha = document.getElementById("latFechaPrimerVencimiento");
+        if(inputFecha) inputFecha.min = hoy;
+
+        document.querySelector(".btn-agregar-carrito").addEventListener("click", function() {
+            const selectTalla = document.getElementById("detalleTalla");
+            const selectColor = document.getElementById("detalleColor");
+            const tallaSel = selectTalla ? selectTalla.value : null;
+            const colorSel = selectColor ? selectColor.value : null;
+
+            if(!tallaSel || !colorSel || tallaSel === "") {
+                Swal.fire({ icon: 'warning', title: '¡Atención, mano!', text: 'Por favor, selecciona una Talla y Color válidos.', confirmButtonColor: '#111' });
+                return;
+            }
+
+            const varianteMatcheada = listaVariantesCompleta.find(d => d.talla === tallaSel && d.color.toLowerCase() === colorSel.toLowerCase() && d.estado === 1);
+
+            if(!varianteMatcheada) {
+                Swal.fire({ icon: 'error', title: 'Oops...', text: 'Esta combinación no se encuentra disponible.', confirmButtonColor: '#111' });
+                return;
+            }
+
+            const imagenProd = document.getElementById("fotoGrande").src;
+
+            const itemCarrito = {
+                idDetalle: varianteMatcheada.idDetalle,
+                producto: nombreProductoMaestro,
+                talla: tallaSel,
+                color: colorSel,
+                precio: precioProductoMaestro,
+                imagen: imagenProd,
+                cantidad: 1,
+                subtotal: precioProductoMaestro
+            };
+
+            let carrito = JSON.parse(localStorage.getItem("carritoUrbana")) || [];
+
+            const existeIndex = carrito.findIndex(item => item.idDetalle === varianteMatcheada.idDetalle);
+            if(existeIndex > -1) {
+                carrito[existeIndex].cantidad += 1;
+                carrito[existeIndex].subtotal = carrito[existeIndex].cantidad * carrito[existeIndex].precio;
+            } else {
+                carrito.push(itemCarrito);
+            }
+
+            localStorage.setItem("carritoUrbana", JSON.stringify(carrito));
+            actualizarNumeroBurbuja();
+            renderizarContenidoLateral();
+            toggleCarritoLateral();
+        });
+    });
+
+    // BÚSQUEDA AUTOMÁTICA DE CLIENTE POR DNI EN LA BASE DE DATOS
+    function buscarClientePorDniWeb() {
+        let dni = document.getElementById("latCelular").value.trim();
+
+        if (dni.length === 8) {
+            // Reutiliza tu endpoint de la intranet que busca clientes por DNI
+            fetch(`/clientes/buscarPorDni?dni=${dni}`)
+                .then(res => {
+                    if(!res.ok) return null;
+                    return res.json();
+                })
+                .then(cliente => {
+                    if (cliente) {
+                        document.getElementById("latNombre").value = cliente.nombres;
+                        document.getElementById("latApellidoPaterno").value = cliente.apellido_Paterno || "";
+                        document.getElementById("latApellidoMaterno").value = cliente.apellido_Materno || "";
+
+                        // Bloqueamos para que no edite si ya existe
+                        document.getElementById("latNombre").readOnly = true;
+                        document.getElementById("latApellidoPaterno").readOnly = true;
+                        document.getElementById("latApellidoMaterno").readOnly = true;
+
+                        Swal.fire({ icon: 'success', title: 'Cliente Encontrado', text: `Hola de nuevo, ${cliente.nombres}!`, timer: 2000, showConfirmButton: false });
+                    } else {
+                        // Si es nuevo, limpiamos y habilitamos los campos para que se registre
+                        document.getElementById("latNombre").value = "";
+                        document.getElementById("latApellidoPaterno").value = "";
+                        document.getElementById("latApellidoMaterno").value = "";
+
+                        document.getElementById("latNombre").readOnly = false;
+                        document.getElementById("latApellidoPaterno").readOnly = false;
+                        document.getElementById("latApellidoMaterno").readOnly = false;
+                    }
+                })
+                .catch(err => console.log("Error al buscar DNI:", err));
+        }
+    }
+
+    function toggleCarritoLateral() {
+        const sidebar = document.getElementById("cartSidebar");
+        const overlay = document.getElementById("cartOverlay");
+        if(sidebar.classList.contains("active")) {
+            sidebar.classList.remove("active");
+            overlay.style.display = "none";
+        } else {
+            sidebar.classList.add("active");
+            overlay.style.display = "block";
+            renderizarContenidoLateral();
+        }
+    }
+
+    function alternarTipoPago() {
+        const tipo = document.getElementById("latTipoPago").value;
+        const seccionCredito = document.getElementById("seccionCreditoOptions");
+        const wrapperOp = document.getElementById("wrapperCodigoOperacion");
+        const wrapperMedios = document.getElementById("wrapperMediosPago");
+
+        if(tipo === "CREDITO") {
+            seccionCredito.classList.remove("d-none");
+            wrapperOp.classList.add("d-none");
+            wrapperMedios.classList.add("d-none"); // Crédito interno no usa Yape/Tarjeta en línea
+            calcularMontoCuotaDinamico();
+        } else {
+            seccionCredito.classList.add("d-none");
+            wrapperOp.classList.remove("d-none");
+            wrapperMedios.classList.remove("d-none");
+        }
+        renderizarContenidoLateral();
+    }
+
+    function seleccionarMedio(medio) {
+        let carrito = JSON.parse(localStorage.getItem("carritoUrbana")) || [];
+        let totalBase = carrito.reduce((sum, i) => sum + i.subtotal, 0);
+
+        if((medio === "YAPE" || medio === "PLIN") && totalBase > 500) {
+            Swal.fire({ icon: 'warning', title: 'Monto Excedido', text: 'No se permite Yape ni Plin para montos mayores a S/ 500.00. Elige Tarjeta o Transferencia.', confirmButtonColor: '#111' });
+            return;
+        }
+
+        medioPagoSeleccionado = medio;
+        document.querySelectorAll("#contenedorMediosPago button").forEach(b => {
+            b.classList.remove("btn-dark", "text-white");
+            b.classList.add("btn-outline-dark");
+        });
+
+        const btnActivo = document.getElementById("btnMedio" + medio);
+        if(btnActivo) {
+            btnActivo.classList.remove("btn-outline-dark");
+            btnActivo.classList.add("btn-dark", "text-white");
+        }
+    }
+
+    function calcularMontoCuotaDinamico() {
+        let carrito = JSON.parse(localStorage.getItem("carritoUrbana")) || [];
+        let totalBase = carrito.reduce((sum, i) => sum + i.subtotal, 0);
+        let txtCuotas = document.getElementById("latCuotas");
+        let lblCuota = document.getElementById("lblSubprecioMensual");
+
+        let cuotas = parseInt(txtCuotas.value) || 1;
+        if (cuotas <= 0) {
+            txtCuotas.value = 1;
+            cuotas = 1;
+        }
+
+        let montoPorMes = totalBase / cuotas;
+        if(lblCuota) lblCuota.innerText = `S/ ${montoPorMes.toFixed(2)} x mes`;
+    }
+
+    function renderizarContenidoLateral() {
+        let carrito = JSON.parse(localStorage.getItem("carritoUrbana")) || [];
+        const body = document.getElementById("cartBodyContainer");
+        body.innerHTML = "";
+
+        if(carrito.length === 0) {
+            body.innerHTML = `<div class="text-center py-5 text-muted small text-uppercase">Tu bolsa está vacía.</div>`;
+            document.getElementById("totalLateralTexto").innerText = "S/ 0.00";
+            document.getElementById("alertaMonto").classList.add("d-none");
+            return;
+        }
+
+        let totalFinal = 0;
+        let subtotalBase = 0;
+
+        carrito.forEach((item, index) => {
+            subtotalBase += item.subtotal;
+            let divItem = `
+                <div class="item-carrito-lateral d-flex gap-2 mb-3">
+                    <img src="${item.imagen}" class="img-cart-lat" style="width:60px; height:60px; object-fit:cover; border-radius:4px;">
+                    <div class="flex-grow-1">
+                        <div class="fw-bold small text-uppercase" style="font-size:11px; color:#111;">${item.producto}</div>
+                        <div class="text-muted" style="font-size:10px;">TALLA: ${item.talla} | COL: ${item.color}</div>
+                        <div class="fw-bold mt-1" style="font-size:11px;">S/ ${item.precio.toFixed(2)} x ${item.cantidad}</div>
+                        <div class="d-flex align-items-center gap-2 mt-1">
+                            <button class="btn btn-sm btn-light py-0 px-2" style="font-size:11px;" onclick="modificarCantidadLat(${index}, -1)">-</button>
+                            <span style="font-size:11px; font-weight:600;">${item.cantidad}</span>
+                            <button class="btn btn-sm btn-light py-0 px-2" style="font-size:11px;" onclick="modificarCantidadLat(${index}, 1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            body.insertAdjacentHTML("beforeend", divItem);
+        });
+
+        totalFinal = subtotalBase;
+
+        const btnY = document.getElementById("btnMedioYAPE");
+        const btnP = document.getElementById("btnMedioPLIN");
+        const alerta = document.getElementById("alertaMonto");
+
+        if(subtotalBase > 500) {
+            if(btnY) btnY.disabled = true;
+            if(btnP) btnP.disabled = true;
+            if(btnY) btnY.classList.add("opacity-25");
+            if(btnP) btnP.classList.add("opacity-25");
+            if(alerta) alerta.classList.remove("d-none");
+
+            // Si el monto pasó los 500 y tenía Yape/Plin activo, forzar el cambio a Tarjeta de inmediato
+            if(medioPagoSeleccionado === "YAPE" || medioPagoSeleccionado === "PLIN") {
+                medioPagoSeleccionado = "TARJETA";
+            }
+        } else {
+            if(btnY) btnY.disabled = false;
+            if(btnP) btnP.disabled = false;
+            if(btnY) btnY.classList.remove("opacity-25");
+            if(btnP) btnP.classList.remove("opacity-25");
+            if(alerta) alerta.classList.add("d-none");
+        }
+
+        document.getElementById("totalLateralTexto").innerText = `S/ ${totalFinal.toFixed(2)}`;
+        calcularMontoCuotaDinamico();
+        seleccionarMedio(medioPagoSeleccionado);
+    }
+
+    function modificarCantidadLat(index, delta) {
+        let carrito = JSON.parse(localStorage.getItem("carritoUrbana")) || [];
+        let item = carrito[index];
+
+        // Si se va a aumentar la cantidad, validamos contra el stock real
+        if (delta > 0) {
+            // Buscamos la variante exacta en la lista maestra usando el idDetalle
+            const varianteReal = listaVariantesCompleta.find(d => d.idDetalle === item.idDetalle);
+
+            if (varianteReal) {
+                const stockDisponible = varianteReal.stock;
+
+                // Si la cantidad actual + 1 supera el stock, lo frenamos
+                if (item.cantidad + delta > stockDisponible) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Stock Límite',
+                        text: `Lo siento, mano. Solo quedan ${stockDisponible} unidades disponibles de este producto.`,
+                        confirmButtonColor: '#111'
+                    });
+                    return; // Corta la ejecución para que no aumente
+                }
+            }
+        }
+
+        // Si pasa la validación (o si es una resta), actualizamos el carrito
+        item.cantidad += delta;
+
+        if (item.cantidad <= 0) {
+            carrito.splice(index, 1);
+        } else {
+            item.subtotal = item.cantidad * item.precio;
+        }
+
+        localStorage.setItem("carritoUrbana", JSON.stringify(carrito));
+        actualizarNumeroBurbuja();
+        renderizarContenidoLateral();
+    }
+    function actualizarNumeroBurbuja() {
+        let carrito = JSON.parse(localStorage.getItem("carritoUrbana")) || [];
+        let totalItems = carrito.reduce((acum, item) => acum + item.cantidad, 0);
+        document.getElementById("contadorCarrito").innerText = totalItems;
+    }
+
+    function enviarPedidoBackend() {
+        const dni = document.getElementById("latCelular").value.trim();
+        const nombre = document.getElementById("latNombre").value.trim();
+        const apellidoPaterno = document.getElementById("latApellidoPaterno").value.trim();
+        const apellidoMaterno = document.getElementById("latApellidoMaterno").value.trim();
+        const tipoPago = document.getElementById("latTipoPago").value;
+        const codigoOp = document.getElementById("latCodigoOperacion").value.trim();
+        let carrito = JSON.parse(localStorage.getItem("carritoUrbana")) || [];
+
+        if (nombre === "" || apellidoPaterno === "" || apellidoMaterno === "") {
+            Swal.fire({ icon: 'error', title: 'Campos Incompletos', text: 'Por favor, completa tus nombres y ambos apellidos, mano.', confirmButtonColor: '#111' });
+            return;
+        }
+        if (dni.length !== 8) {
+            Swal.fire({ icon: 'warning', title: 'DNI Inválido', text: 'El DNI debe tener exactamente 8 dígitos.', confirmButtonColor: '#111' });
+            return;
+        }
+        if (carrito.length === 0) return;
+
+        let txtMontoFinal = document.getElementById("totalLateralTexto").innerText.replace("S/ ", "");
+        let totalCalculado = parseFloat(txtMontoFinal);
+
+        let subtotalCalculado = totalCalculado / 1.18;
+        let igvCalculado = totalCalculado - subtotalCalculado;
+
+        let cuotas = 0;
+        let montoCuota = 0.0;
+        let fechaPrimerVencimiento = null;
+
+        if (tipoPago === "CREDITO") {
+            cuotas = parseInt(document.getElementById("latCuotas").value) || 0;
+            fechaPrimerVencimiento = document.getElementById("latFechaPrimerVencimiento").value;
+
+            if (!fechaPrimerVencimiento || fechaPrimerVencimiento === "") {
+                Swal.fire({ icon: 'warning', title: 'Fecha requerida', text: 'Por favor seleccione la fecha del primer vencimiento.', confirmButtonColor: '#111' });
+                return;
+            }
+            if (cuotas <= 0) {
+                Swal.fire({ icon: 'warning', title: 'Cuotas incorrectas', text: 'El número de cuotas del crédito debe ser 1 o más.', confirmButtonColor: '#111' });
+                return;
+            }
+            montoCuota = totalCalculado / cuotas;
+        } else {
+            if (codigoOp === "" && (medioPagoSeleccionado !== "EFECTIVO")) {
+                Swal.fire({ icon: 'warning', title: 'Código Operación', text: 'Este método de pago requiere registrar el código de operación.', confirmButtonColor: '#111' });
+                return;
+            }
+        }
+
+        let ventaRequestPayload = {
+            dni: dni,
+            nombreCliente: nombre,
+            apellidoPaterno: apellidoPaterno,
+            apellidoMaterno: apellidoMaterno,
+            subtotal: parseFloat(subtotalCalculado.toFixed(2)),
+            igv: parseFloat(igvCalculado.toFixed(2)),
+            total: parseFloat(totalCalculado.toFixed(2)),
+            metodoPago: tipoPago === "CREDITO" ? "CREDITO" : medioPagoSeleccionado,
+            tipoPago: tipoPago,
+            codigoOperacion: tipoPago === "CREDITO" ? "" : codigoOp,
+            cuotas: cuotas,
+            montoCuota: parseFloat(montoCuota.toFixed(2)),
+            fechaPrimerVencimiento: fechaPrimerVencimiento,
+            detalles: carrito.map(item => ({
+                idDetalle: parseInt(item.idDetalle),
+                cantidad: parseInt(item.cantidad),
+                precio: parseFloat(item.precio),
+                subtotal: parseFloat(item.subtotal.toFixed(2))
+            }))
+        };
+
+        const btnProcesar = document.querySelector(".btn-finalizar");
+        if(btnProcesar) btnProcesar.disabled = true;
+
+        // Mostrar SweetAlert2 cargando para mejorar UX
+        Swal.fire({
+            title: 'Procesando tu compra...',
+            text: 'Espere un momento por favor.',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        fetch("/ventas/guardar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(ventaRequestPayload)
+        })
+        .then(res => {
+            if (!res.ok) return res.text().then(text => { throw new Error(text) });
+            return res.json();
+        })
+        .then((data) => {
+            Swal.fire({
+                icon: 'success',
+                title: '¡Pedido Recibido!',
+                text: 'Tu venta y sus movimientos de almacén se procesaron correctamente.',
+                confirmButtonColor: '#111'
+            }).then(() => {
+                localStorage.removeItem("carritoUrbana");
+                location.reload();
+            });
+        })
+        .catch(error => {
+            console.error(error);
+            Swal.fire({ icon: 'error', title: 'Error en Servidor', text: 'Hubo un percance al procesar la compra: ' + error.message, confirmButtonColor: '#111' });
+            if(btnProcesar) btnProcesar.disabled = false;
+        });
+    }
+
+    function actualizarIndicadorStock() {
+        const selectTalla = document.getElementById("detalleTalla");
+        const selectColor = document.getElementById("detalleColor");
+        const containerStatus = document.getElementById("txtStockStatus");
+        if (!selectTalla || !selectColor || !containerStatus) return;
+
+        const tallaUnica = selectTalla.value;
+        const colorUnico = selectColor.value;
+
+        const varianteMatcheada = listaVariantesCompleta.find(d => d.talla === tallaUnica && d.color.toLowerCase() === colorUnico.toLowerCase() && d.estado === 1);
+        if (!varianteMatcheada) {
+            containerStatus.innerHTML = `<i class="bi bi-exclamation-octagon-fill"></i> No disponible`;
+            containerStatus.style.color = "#999";
+            return;
+        }
+
+        const stockEncontrado = varianteMatcheada.stock;
+        const stockMinimoConfig = varianteMatcheada.stockMinimo || 0;
+
+        if (stockEncontrado <= 0) {
+            containerStatus.innerHTML = `<i class="bi bi-exclamation-octagon-fill"></i> Agotado`;
+            containerStatus.style.color = "#f44336";
+        } else if (stockEncontrado <= stockMinimoConfig) {
+            containerStatus.innerHTML = `<i class="bi bi-fire"></i> ¡Últimas unidades! (${stockEncontrado})`;
+            containerStatus.style.color = "#ff9800";
+        } else {
+            containerStatus.innerHTML = `<i class="bi bi-check-circle-fill"></i> Stock disponible (${stockEncontrado})`;
+            containerStatus.style.color = "#2e7d32";
+        }
+    }
+    // =====================================================================
+    // VALIDACIONES EN TIEMPO REAL PARA EL CLIENTE
+    // =====================================================================
+
+    const inputDni = document.getElementById("latCelular");
+    const inputNombre = document.getElementById("latNombre");
+    const inputApePaterno = document.getElementById("latApellidoPaterno");
+    const inputApeMaterno = document.getElementById("latApellidoMaterno");
+
+    // 1. DNI: Solo números (reemplaza todo lo que NO sea dígito del 0 al 9)
+    if (inputDni) {
+        inputDni.addEventListener("input", function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+    }
+
+    // 2. Nombres: Solo letras, espacios y tildes
+    if (inputNombre) {
+        inputNombre.addEventListener("input", function() {
+            this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '');
+        });
+    }
+
+    // 3. Apellido Paterno: Solo letras, espacios y tildes
+    if (inputApePaterno) {
+        inputApePaterno.addEventListener("input", function() {
+            this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '');
+        });
+    }
+
+    // 4. Apellido Materno: Solo letras, espacios y tildes
+    if (inputApeMaterno) {
+        inputApeMaterno.addEventListener("input", function() {
+            this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ ]/g, '');
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<div xmlns:th="http://www.thymeleaf.org">
+
+    <div class="content-header">
+        <h1>LISTADO PERMISOS</h1>
+    </div>
+
+    <div class="card">
+
+        <div class="card-header">
+            <button class="btn btn-primary btn-sm float-end"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalPermiso">
+                Nuevo Permiso
+            </button>
+        </div>
+
+        <div class="card-body">
+
+            <!-- 🔥 IMPORTANTE: MISMO FORMATO QUE USUARIOS -->
+            <table id="tabla_permiso_serverside"
+                   class="table table-bordered table-striped">
+
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="p, iter : ${permisos}">
+
+                    <td th:text="${iter.index + 1}"></td>
+
+                    <td th:text="${p.nombre}"></td>
+
+                    <!-- ESTADO -->
+                    <td>
+                        <span th:if="${p.estado == 1}" class="badge bg-success">Activo</span>
+                        <span th:if="${p.estado == 0}" class="badge bg-danger">Inactivo</span>
+                    </td>
+
+                    <td>
+
+                        <!-- ACTIVO -->
+                        <div th:if="${p.estado == 1}">
+
+                            <button class="btn btn-warning btn-sm"
+                                    onclick="editarPermiso(this)"
+                                    th:data-id="${p.idPermiso}"
+                                    th:data-nombre="${p.nombre}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="eliminarPermiso(this)"
+                                    th:data-id="${p.idPermiso}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+
+                        </div>
+
+                        <!-- INACTIVO -->
+                        <div th:if="${p.estado == 0}">
+
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="bi bi-trash"></i>
+                            </button>
+
+                            <button class="btn btn-success btn-sm"
+                                    onclick="reactivarPermiso(this)"
+                                    th:data-id="${p.idPermiso}">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+    <!-- ================= MODAL CREAR ================= -->
+    <div class="modal fade" id="modalPermiso" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <form id="formPermiso">
+
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Nuevo Permiso</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <input type="text" name="nombre" class="form-control" required onkeypress="return soloLetras(event)">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL EDITAR ================= -->
+    <div class="modal fade" id="modalEditarPermiso" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <form id="formEditarPermiso">
+
+                    <input type="hidden" name="idPermiso" id="edit_idPermiso">
+
+                    <div class="modal-header bg-warning">
+                        <h5 class="modal-title">Editar Permiso</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <input type="text" name="nombre" id="edit_nombrePermiso" class="form-control" required onkeypress="return soloLetras(event)">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Actualizar</button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Tienda Urbana</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
+
+        html{
+            scroll-behavior:smooth;
+        }
+
+        body{
+            font-family:'Montserrat', sans-serif;
+            background:#fff;
+            color:#111;
+            overflow-x:hidden;
+        }
+
+        a{
+            text-decoration:none;
+            color:inherit;
+        }
+
+        /* ========================================= */
+        /* NAVBAR */
+        /* ========================================= */
+
+        .navbar-custom{
+            background:#fff;
+            border-bottom:1px solid #eee;
+            padding:14px 0;
+            position:sticky;
+            top:0;
+            z-index:999;
+        }
+
+        .logo{
+            font-size:32px;
+            font-weight:800;
+            letter-spacing:3px;
+        }
+
+       .logo-img{
+        max-height:60px;
+        width:auto;
+        object-fit:contain;
+        transition:0.3s;
+    }
+
+    .logo-img:hover{
+        transform:scale(1.03);
+    }
+
+        .nav-link{
+            font-size:13px;
+            font-weight:600;
+            text-transform:uppercase;
+            margin:0 12px;
+            position:relative;
+            transition:0.3s;
+        }
+
+        .nav-link:hover{
+            color:#777 !important;
+        }
+
+        .nav-link::after{
+            content:"";
+            position:absolute;
+            left:0;
+            bottom:-5px;
+            width:0%;
+            height:1px;
+            background:#111;
+            transition:0.3s;
+        }
+
+        .nav-link:hover::after{
+            width:100%;
+        }
+
+        .navbar-toggler{
+            border:none;
+        }
+
+        .navbar-toggler:focus{
+            box-shadow:none;
+        }
+
+        /* ========================================= */
+        /* HERO */
+        /* ========================================= */
+
+        .hero{
+            position:relative;
+            height:85vh;
+            overflow:hidden;
+        }
+
+        .hero::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            background:rgba(0,0,0,0.40);
+            z-index:1;
+        }
+
+        .hero img,
+        .hero-slider-img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            object-position:center center;
+        }
+        .carousel,
+        .carousel-inner,
+        .carousel-item{
+            height:100%;
+        }
+        .hero-overlay{
+            position:absolute;
+            top:50%;
+            left:50%;
+            transform:translate(-50%, -50%);
+            text-align:center;
+            width:90%;
+            z-index:5;
+            color:#fff;
+        }
+
+        .hero-overlay p{
+            font-size:13px;
+            letter-spacing:4px;
+            text-transform:uppercase;
+            margin-bottom:15px;
+            color:#ddd;
+        }
+
+        .hero-overlay h1{
+            font-size:62px;
+            font-weight:800;
+            text-transform:uppercase;
+            line-height:1.1;
+            color:#fff;
+            text-shadow:0 4px 25px rgba(0,0,0,0.5);
+        }
+
+        .hero-btn{
+            border:1px solid #fff;
+            padding:14px 34px;
+            display:inline-block;
+            margin-top:25px;
+            font-size:12px;
+            text-transform:uppercase;
+            letter-spacing:2px;
+            color:#fff;
+            transition:0.3s;
+        }
+
+        .hero-btn:hover{
+            background:#fff;
+            color:#111;
+        }
+
+        .carousel-item{
+            position:relative;
+        }
+
+        /* ========================================= */
+        /* PRODUCTOS */
+        /* ========================================= */
+
+        .products{
+            padding:90px 0;
+        }
+
+        .product-card{
+            text-align:left;
+            margin-bottom:40px;
+            transition:0.3s;
+        }
+
+        .product-card:hover{
+            transform:translateY(-5px);
+        }
+
+        .product-card img{
+            width:100%;
+            height:420px;
+            object-fit:cover;
+            background:#f5f5f5;
+            transition:0.4s;
+        }
+
+        .product-card:hover img{
+            transform:scale(1.02);
+        }
+
+        .product-title{
+            margin-top:15px;
+            font-size:15px;
+            font-weight:700;
+        }
+
+        .product-price{
+            font-size:14px;
+            color:#666;
+            margin-top:4px;
+        }
+
+        /* NUEVOS ESTILOS PARA LOS SELECTS MINIMALISTAS */
+        .select-filtro-urbano {
+            width: auto;
+            min-width: 140px;
+            border: 1px solid #ccc;
+            border-radius: 0;
+            font-size: 12px;
+            letter-spacing: 1px;
+            font-weight: 500;
+            text-transform: uppercase;
+            box-shadow: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .select-filtro-urbano:focus {
+            border-color: #111;
+            box-shadow: none;
+        }
+
+        /* Suavizado de entrada al actualizar las tarjetas */
+        .fade-in-productos {
+            animation: fadeInSimple 0.4s ease-in-out;
+        }
+
+        @keyframes fadeInSimple {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========================================= */
+        /* MARQUEE */
+        /* ========================================= */
+
+        .marquee{
+            overflow:hidden;
+            white-space:nowrap;
+            border-top:1px solid #eee;
+            border-bottom:1px solid #eee;
+            padding:18px 0;
+            font-size:14px;
+            font-weight:600;
+            text-transform:uppercase;
+            background:#fafafa;
+        }
+
+        .marquee span{
+            margin-right:50px;
+        }
+
+        /* ========================================= */
+        /* CATEGORIAS */
+        /* ========================================= */
+
+        .categories{
+            padding:100px 0;
+        }
+
+        .category-list h2{
+            font-size:60px;
+            font-weight:700;
+            line-height:1.4;
+            color:#bbb;
+            transition:0.3s;
+            cursor:pointer;
+        }
+
+        .category-list h2:hover{
+            color:#111;
+        }
+
+        .category-list .active{
+            color:#111;
+        }
+
+        .categories img{
+            width:100%;
+            height:600px;
+            object-fit:cover;
+            border-radius:4px;
+        }
+
+        /* ========================================= */
+        /* BANNER */
+        /* ========================================= */
+
+        .banner{
+            position:relative;
+            height:70vh;
+            overflow:hidden;
+        }
+
+        .banner::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            background:rgba(0,0,0,0.35);
+            z-index:1;
+        }
+
+        .banner img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+        }
+
+        .banner-content{
+            position:absolute;
+            bottom:50%;
+            left:50%;
+            transform:translate(-50%, 50%);
+            text-align:center;
+            color:#fff;
+            z-index:5;
+            width:90%;
+        }
+
+        .banner-content h2{
+            font-size:52px;
+            font-weight:800;
+            text-transform:uppercase;
+        }
+
+        .banner-content a{
+            border:1px solid #fff;
+            padding:12px 30px;
+            display:inline-block;
+            margin-top:20px;
+            text-transform:uppercase;
+            font-size:13px;
+            transition:0.3s;
+        }
+
+        .banner-content a:hover{
+            background:#fff;
+            color:#111;
+        }
+
+        /* ========================================= */
+        /* RESPONSIVE */
+        /* ========================================= */
+
+        @media(max-width:992px){
+
+            .hero{
+                height:75vh;
+            }
+
+            .hero-overlay h1{
+                font-size:42px;
+            }
+
+            .category-list{
+                text-align:center;
+                margin-bottom:40px;
+            }
+
+            .category-list h2{
+                font-size:42px;
+            }
+
+            .categories img{
+                height:450px;
+            }
+
+            .select-filtro-urbano {
+                width: 100%;
+            }
+
+        }
+
+        @media(max-width:768px){
+
+            .navbar-brand{
+                margin:auto;
+            }
+
+            .logo-img{
+                height:45px;
+            }
+
+            .hero{
+                height:70vh;
+            }
+
+            .hero-overlay{
+                width:95%;
+                padding:0 10px;
+            }
+
+            .hero-overlay h1{
+                font-size:32px;
+                line-height:1.2;
+            }
+
+            .hero-overlay p{
+                font-size:11px;
+                letter-spacing:2px;
+            }
+
+            .hero-btn{
+                padding:10px 22px;
+                font-size:11px;
+            }
+
+            .product-card img{
+                height:260px;
+            }
+
+            .category-list h2{
+                font-size:32px;
+            }
+
+            .categories{
+                padding:60px 0;
+            }
+
+            .categories img{
+                height:350px;
+                margin-top:30px;
+            }
+
+            .banner-content h2{
+                font-size:30px;
+            }
+
+            .banner{
+                height:50vh;
+            }
+            .marquee div{
+                display:flex;
+                justify-content:center;
+                align-items:center;
+                gap:50px;
+                flex-wrap:wrap;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light navbar-custom">
+
+    <div class="container">
+
+        <a class="navbar-brand logo d-flex align-items-center"
+           href="/web">
+
+            <img th:if="${logoActivo != null}"
+                 th:src="${logoActivo.imagen}"
+                 alt="Logo"
+                 class="logo-img">
+
+        </a>
+
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#menu">
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+        <div class="collapse navbar-collapse"
+             id="menu">
+
+            <ul class="navbar-nav mx-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="#hero">
+                        Inicio
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="#tienda">
+                        Tienda
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="#coleccion">
+                        Colección
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="#vendemos">
+                        Vendemos
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="#">
+                        Contacto
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</nav>
+
+<section id="hero" class="hero">
+
+    <div th:if="${#lists.size(sliders) == 1}">
+
+        <div th:each="s : ${sliders}">
+
+            <img th:src="${s.imagen}" alt="">
+
+            <div class="hero-overlay text-center">
+
+                <p th:text="${s.subtitulo}">
+                </p>
+
+                <h1 th:text="${s.titulo}">
+                </h1>
+
+                <a th:href="${s.linkBoton}"
+                   class="hero-btn"
+                   th:text="${s.textoBoton}">
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div th:if="${#lists.size(sliders) > 1}">
+
+        <div id="carouselHero"
+             class="carousel slide carousel-fade h-100"
+             data-bs-ride="carousel"
+             data-bs-interval="3000"
+             data-bs-touch="true"
+             data-bs-pause="false">
+
+            <div class="carousel-indicators">
+
+                <button th:each="s,iter : ${sliders}"
+                        type="button"
+                        data-bs-target="#carouselHero"
+                        th:data-bs-slide-to="${iter.index}"
+                        th:classappend="${iter.index == 0} ? 'active'">
+                </button>
+
+            </div>
+
+            <div class="carousel-inner h-100">
+
+                <div class="carousel-item h-100"
+                     th:each="s,iter : ${sliders}"
+                     th:classappend="${iter.index == 0} ? 'active'">
+
+                    <img th:src="${s.imagen}"
+                         class="d-block w-100 hero-slider-img">
+                    <div class="hero-overlay text-center">
+
+                        <p th:text="${s.subtitulo}">
+                        </p>
+
+                        <h1 th:text="${s.titulo}">
+                        </h1>
+
+                        <a th:href="${s.linkBoton}"
+                           class="hero-btn"
+                           th:text="${s.textoBoton}">
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <button class="carousel-control-prev"
+                    type="button"
+                    data-bs-target="#carouselHero"
+                    data-bs-slide="prev">
+
+                <span class="carousel-control-prev-icon"></span>
+
+            </button>
+
+            <button class="carousel-control-next"
+                    type="button"
+                    data-bs-target="#carouselHero"
+                    data-bs-slide="next">
+
+                <span class="carousel-control-next-icon"></span>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section >
+
+<section id="tienda" class="products">
+
+    <div class="container">
+
+        <div class="row mb-5 justify-content-between align-items-center g-3" style="border-bottom: 1px solid #eee; padding-bottom: 25px;">
+
+            <div class="col-12 col-md-3">
+                <input type="text" id="filtroBuscar" class="form-control" placeholder="BUSCAR PRODUCTO..."
+                       style="border: none; border-bottom: 1px solid #111; border-radius: 0; font-size: 12px; letter-spacing: 1px; padding: 8px 0; box-shadow: none;">
+            </div>
+
+            <div class="col-12 col-md-9 d-flex flex-wrap gap-3 justify-content-md-end">
+
+                <select id="filtroCategoria" class="form-select select-filtro-urbano">
+                    <option value="">CATEGORÍAS</option>
+                    <option th:each="c : ${categoriasDisponibles}"
+                            th:value="${c.idCategoria}"
+                            th:text="${#strings.toUpperCase(c.nombre)}">
+                    </option>
+                </select>
+
+                <select id="filtroTalla" class="form-select select-filtro-urbano" style="min-width: 100px;">
+                    <option value="">TALLAS</option>
+                    <option th:each="t : ${tallasDisponibles}"
+                            th:value="${t}"
+                            th:text="${t}">
+                    </option>
+                </select>
+
+                <select id="filtroColor" class="form-select select-filtro-urbano">
+                    <option value="">COLORES</option>
+                    <option th:each="col : ${coloresDisponibles}"
+                            th:value="${col}"
+                            th:text="${#strings.toUpperCase(col)}">
+                    </option>
+                </select>
+
+                <select id="filtroPrecio" class="form-select select-filtro-urbano" style="min-width: 150px;">
+                    <option value="">PRECIOS</option>
+                    <option value="0-50">Hasta S/ 50</option>
+                    <option value="50-100">S/ 50 - S/ 100</option>
+                    <option value="100-200">S/ 100 - S/ 200</option>
+                    <option value="200-9999">Más de S/ 200</option>
+                </select>
+
+                <button type="button" id="btnLimpiarFiltros" class="btn btn-sm"
+                        style="border: 1px solid #111; border-radius: 0; font-size: 11px; letter-spacing: 1px; font-weight: 600; text-transform: uppercase; padding: 6px 15px; background: transparent; transition: 0.3s;">
+                    LIMPIAR
+                </button>
+            </div>
+        </div>
+
+        <div class="row g-4" id="contenedorProductosWeb">
+
+            <div class="col-6 col-md-6 col-lg-3" th:each="p : ${productos}">
+                <a th:href="@{'/web/producto/' + ${p.idProducto}}" style="text-decoration: none; color: inherit;">
+                    <div class="product-card" style="cursor: pointer;">
+                        <img th:if="${p.imagen != null}"
+                             th:src="${#strings.arraySplit(p.imagen, ',')[0]}"
+                             alt="">
+                        <div class="product-title" th:text="${p.nombre}"></div>
+                        <div class="product-price" th:text="'S/ ' + ${p.precio}"></div>
+                    </div>
+                </a>
+            </div>
+
+            <div id="sinProductos" class="col-12 text-center py-5 d-none">
+                <p style="font-size: 13px; letter-spacing: 2px; color: #777; text-transform: uppercase;">No se encontraron productos con los filtros seleccionados.</p>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="marquee">
+
+    <div class="text-center">
+
+        <span th:text="${empresa.marqueeTexto}"></span>
+        <span> SOLO SÉ TÚ</span>
+
+        <span th:text="${empresa.marqueeTexto}"></span>
+        <span> SOLO SÉ TÚ</span>
+        <span th:text="${empresa.marqueeTexto}"></span>
+
+    </div>
+
+</section>
+<section id="vendemos" class="categories">
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-lg-6">
+
+                <div class="category-list">
+
+                    <h2 class="active"
+                        th:text="${empresa.categoria1}">
+                    </h2>
+
+                    <h2 th:text="${empresa.categoria2}">
+                    </h2>
+
+                    <h2 th:text="${empresa.categoria3}">
+                    </h2>
+
+                    <h2 th:text="${empresa.categoria4}">
+                    </h2>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-6">
+
+                <img th:if="${empresa.imagenCategorias != null}"
+                     th:src="${empresa.imagenCategorias}"
+                     alt="Categorias">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section >
+
+<section id="coleccion" class="banner">
+
+    <img th:if="${empresa.bannerImagen != null}"
+         th:src="${empresa.bannerImagen}"
+         alt="Banner">
+
+    <div class="banner-content">
+
+        <h2 th:text="${empresa.bannerTitulo}">
+        </h2>
+
+        <a th:href="${empresa.bannerLink}"
+           th:text="${empresa.bannerBoton}">
+        </a>
+
+    </div>
+
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const txtBuscar = document.getElementById("filtroBuscar");
+        const selectCategoria = document.getElementById("filtroCategoria");
+        const selectTalla = document.getElementById("filtroTalla");
+        const selectColor = document.getElementById("filtroColor");
+        const selectPrecio = document.getElementById("filtroPrecio");
+        const btnLimpiar = document.getElementById("btnLimpiarFiltros");
+        const contenedor = document.getElementById("contenedorProductosWeb");
+        const sinProductos = document.getElementById("sinProductos");
+
+        // Escuchadores de eventos para ejecución instantánea
+        txtBuscar.addEventListener("input", ejecutarFiltro);
+        selectCategoria.addEventListener("change", ejecutarFiltro);
+        selectTalla.addEventListener("change", ejecutarFiltro);
+        selectColor.addEventListener("change", ejecutarFiltro);
+        selectPrecio.addEventListener("change", ejecutarFiltro);
+
+        btnLimpiar.addEventListener("click", function() {
+            txtBuscar.value = "";
+            selectCategoria.value = "";
+            selectTalla.value = "";
+            selectColor.value = "";
+            selectPrecio.value = "";
+            ejecutarFiltro();
+        });
+
+        function ejecutarFiltro() {
+            let queryParams = new URLSearchParams({
+                term: txtBuscar.value.trim(),
+                idCategoria: selectCategoria.value,
+                talla: selectTalla.value,
+                color: selectColor.value,
+                rangoPrecio: selectPrecio.value
+            });
+
+            fetch(`/api/web/productos/filtrar?${queryParams.toString()}`)
+                .then(res => {
+                    if(!res.ok) throw new Error("Error consultando filtros");
+                    return res.json();
+                })
+                .then(productos => {
+                    // Removemos las tarjetas anteriores manteniendo el div de "sin productos"
+                    const tarjetas = contenedor.querySelectorAll(".col-6");
+                    tarjetas.forEach(t => t.remove());
+
+                    if (productos.length === 0) {
+                        sinProductos.classList.remove("d-none");
+                        return;
+                    }
+
+                    sinProductos.classList.add("d-none");
+
+                    // Mapeamos los nuevos resultados manteniendo exactamente tu estructura HTML
+                    productos.forEach(p => {
+                        let primeraImagen = p.imagen ? p.imagen.split(",")[0] : '';
+
+                        let itemHtml = `
+                            <div class="col-6 col-md-6 col-lg-3 fade-in-productos">
+                                <div class="product-card">
+                                    ${primeraImagen ? `<img src="${primeraImagen}" alt="">` : ''}
+                                    <div class="product-title">${p.nombre}</div>
+                                    <div class="product-price">S/ ${p.precio}</div>
+                                </div>
+                            </div>
+                        `;
+                        contenedor.insertAdjacentHTML("beforeend", itemHtml);
+                    });
+                })
+                .catch(err => console.error("Error al filtrar la grilla:", err));
+        }
+    });
+</script>
+
+</body>
+
+</html>

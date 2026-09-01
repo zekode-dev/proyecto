@@ -1,0 +1,174 @@
+<div xmlns:th="http://www.thymeleaf.org">
+
+    <div class="content-header">
+        <h1>LISTADO ROLES</h1>
+    </div>
+
+    <div class="card">
+
+        <div class="card-header">
+            <button class="btn btn-primary btn-sm float-end"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalRol">
+                Nuevo Rol
+            </button>
+        </div>
+
+        <div class="card-body">
+
+            <table id="tabla_rol_serverside" class="table table-bordered table-striped">
+
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="r, iter : ${roles}">
+
+                    <td th:text="${iter.index + 1}"></td>
+                    <td th:text="${r.nombre}"></td>
+
+                    <td>
+                        <span th:if="${r.estado == 1}" class="badge bg-success">Activo</span>
+                        <span th:if="${r.estado == 0}" class="badge bg-danger">Inactivo</span>
+                    </td>
+
+                    <td>
+
+                        <!--  ROL ACTIVO -->
+                        <div th:if="${r.estado == 1}">
+
+                            <button class="btn btn-warning btn-sm"
+                                    onclick="editarRol(this)"
+                                    th:data-id="${r.idRol}"
+                                    th:data-nombre="${r.nombre}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="eliminarRol(this)"
+                                    th:data-id="${r.idRol}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+
+                            <button class="btn btn-info btn-sm"
+                                    onclick="verPermisos(this)"
+                                    th:data-id="${r.idRol}">
+                                <i class="bi bi-shield-lock"></i>
+                            </button>
+
+                        </div>
+
+                        <!--  ROL INACTIVO -->
+                        <div th:if="${r.estado == 0}">
+
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="bi bi-trash"></i>
+                            </button>
+
+                            <!--  REACTIVAR -->
+                            <button class="btn btn-success btn-sm"
+                                    onclick="reactivarRol(this)"
+                                    th:data-id="${r.idRol}">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+    <!-- ================= MODAL CREAR ================= -->
+    <div class="modal fade" id="modalRol">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <form id="formRol">
+
+                    <div class="modal-header bg-primary text-white">
+                        <h5>Nuevo Rol</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <input type="text" name="nombre" class="form-control" required onkeypress="return soloLetras(event)">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL EDITAR ================= -->
+    <div class="modal fade" id="modalEditarRol">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <form id="formEditarRol">
+
+                    <input type="hidden" name="idRol" id="edit_idRol">
+
+                    <div class="modal-header bg-warning">
+                        <h5>Editar Rol</h5>
+                    </div>
+
+                    <div class="modal-body">
+                        <input type="text" name="nombre" id="edit_nombre" class="form-control" onkeypress="return soloLetras(event)">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Actualizar</button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL PERMISOS ================= -->
+    <div class="modal fade" id="modalPermisos">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <form id="formPermisos">
+
+                    <input type="hidden" name="idRol" id="permiso_idRol">
+
+                    <div class="modal-header bg-info text-white">
+                        <h5>Permisos</h5>
+                    </div>
+
+                    <div class="modal-body" id="listaPermisos"></div>
+
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>

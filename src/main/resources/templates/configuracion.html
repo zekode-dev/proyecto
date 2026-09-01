@@ -1,0 +1,943 @@
+    <div xmlns:th="http://www.thymeleaf.org">
+
+        <!-- ===================================== -->
+        <!-- HEADER -->
+        <!-- ===================================== -->
+
+        <div class="content-header">
+
+            <h1>
+                CONFIGURACIÓN WEB
+            </h1>
+
+        </div>
+
+        <!-- ===================================== -->
+        <!-- NAV TABS -->
+        <!-- ===================================== -->
+
+        <div class="card shadow">
+
+            <div class="card-header bg-white">
+
+                <ul class="nav nav-tabs card-header-tabs"
+                    id="configTabs">
+
+                    <li class="nav-item">
+
+                        <button class="nav-link active"
+                                data-bs-toggle="tab"
+                                data-bs-target="#tabSliders">
+
+                            <i class="bi bi-images"></i>
+                            Sliders
+
+                        </button>
+
+                    </li>
+                    <li class="nav-item">
+
+                        <button class="nav-link"
+                                data-bs-toggle="tab"
+                                data-bs-target="#tabLogos">
+
+                            <i class="bi bi-image"></i>
+                            Logos
+
+                        </button>
+
+                    </li>
+
+                    <li class="nav-item">
+
+                        <button class="nav-link"
+                                data-bs-toggle="tab"
+                                data-bs-target="#tabEmpresa">
+
+                            <i class="bi bi-building"></i>
+                            Empresa
+
+                        </button>
+
+                    </li>
+
+                </ul>
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="tab-content">
+
+                    <!-- ===================================== -->
+                    <!-- TAB SLIDERS -->
+                    <!-- ===================================== -->
+
+                    <div class="tab-pane fade show active"
+                         id="tabSliders">
+
+                        <div class="d-flex justify-content-end mb-4">
+
+                            <button class="btn btn-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalSlider">
+
+                                <i class="bi bi-plus-circle"></i>
+                                Nuevo Slider
+
+                            </button>
+
+                        </div>
+
+                        <div class="row g-4">
+
+                            <div class="col-md-4"
+                                 th:each="s : ${sliders}">
+
+                                <div class="card border-0 shadow-lg h-100">
+
+                                    <img th:src="${s.imagen}"
+                                         class="card-img-top"
+                                         style="
+                                            height:240px;
+                                            object-fit:cover;
+                                         ">
+
+                                    <div class="card-body">
+
+                                        <h5 class="fw-bold"
+                                            th:text="${s.titulo}">
+                                        </h5>
+
+                                        <p class="text-muted"
+                                           th:text="${s.subtitulo}">
+                                        </p>
+
+                                        <div class="mb-3">
+
+                                            <span th:if="${s.estado == 1}"
+                                                  class="badge bg-success">
+
+                                                Activo
+
+                                            </span>
+
+                                            <span th:if="${s.estado == 0}"
+                                                  class="badge bg-danger">
+
+                                                Inactivo
+
+                                            </span>
+
+                                        </div>
+
+                                        <div class="d-flex gap-2">
+
+                                            <!-- EDITAR -->
+
+                                            <button class="btn btn-warning btn-sm"
+                                                    onclick="editarSlider(this)"
+                                                    th:data-id="${s.idSlider}"
+                                                    th:data-titulo="${s.titulo}"
+                                                    th:data-subtitulo="${s.subtitulo}"
+                                                    th:data-textoboton="${s.textoBoton}"
+                                                    th:data-linkboton="${s.linkBoton}"
+                                                    th:data-imagen="${s.imagen}">
+
+                                                <i class="bi bi-pencil"></i>
+
+                                            </button>
+
+                                            <!-- DESACTIVAR -->
+
+                                            <button th:if="${s.estado == 1}"
+                                                    class="btn btn-danger btn-sm"
+                                                    onclick="desactivarSlider(this)"
+                                                    th:data-id="${s.idSlider}">
+
+                                                <i class="bi bi-eye-slash"></i>
+
+                                            </button>
+
+                                            <!-- ACTIVAR -->
+
+                                            <button th:if="${s.estado == 0}"
+                                                    class="btn btn-success btn-sm"
+                                                    onclick="activarSlider(this)"
+                                                    th:data-id="${s.idSlider}">
+
+                                                <i class="bi bi-eye"></i>
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ===================================== -->
+                    <!-- TAB LOGOS -->
+                    <!-- ===================================== -->
+
+                    <div class="tab-pane fade"
+                         id="tabLogos">
+
+                        <div class="d-flex justify-content-end mb-4">
+
+                            <button class="btn btn-dark"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#modalLogo">
+
+                                <i class="bi bi-plus-circle"></i>
+                                Nuevo Logo
+
+                            </button>
+
+                        </div>
+
+                        <div class="row g-4">
+
+                            <div class="col-md-3"
+                                 th:each="l : ${logos}">
+
+                                <div class="card border-0 shadow-lg h-100">
+
+                                    <div class="p-4 text-center">
+
+                                        <img th:src="${l.imagen}"
+                                             class="img-fluid"
+                                             style="
+                                                height:120px;
+                                                object-fit:contain;
+                                             ">
+
+                                    </div>
+
+                                    <div class="card-body text-center">
+
+                                        <h5 class="fw-bold"
+                                            th:text="${l.nombre}">
+                                        </h5>
+
+                                        <div class="mb-3">
+
+                                            <span th:if="${l.estado == 1}"
+                                                  class="badge bg-success">
+
+                                                Activo
+
+                                            </span>
+
+                                            <span th:if="${l.estado == 0}"
+                                                  class="badge bg-danger">
+
+                                                Inactivo
+
+                                            </span>
+
+                                        </div>
+
+                                        <div class="d-flex justify-content-center gap-2">
+
+                                            <!-- EDITAR -->
+
+                                            <button class="btn btn-warning btn-sm"
+                                                    onclick="editarLogo(this)"
+                                                    th:data-id="${l.idLogo}"
+                                                    th:data-nombre="${l.nombre}"
+                                                    th:data-imagen="${l.imagen}">
+
+                                                <i class="bi bi-pencil"></i>
+
+                                            </button>
+
+                                            <!-- DESACTIVAR -->
+
+                                            <button th:if="${l.estado == 1}"
+                                                    class="btn btn-danger btn-sm"
+                                                    onclick="desactivarLogo(this)"
+                                                    th:data-id="${l.idLogo}">
+
+                                                <i class="bi bi-eye-slash"></i>
+
+                                            </button>
+
+                                            <!-- ACTIVAR -->
+
+                                            <button th:if="${l.estado == 0}"
+                                                    class="btn btn-success btn-sm"
+                                                    onclick="activarLogo(this)"
+                                                    th:data-id="${l.idLogo}">
+
+                                                <i class="bi bi-eye"></i>
+
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- ===================================== -->
+                    <!-- TAB EMPRESA -->
+                    <!-- ===================================== -->
+
+                    <div class="tab-pane fade"
+                         id="tabEmpresa">
+
+                        <form id="formEmpresa"
+                              enctype="multipart/form-data">
+
+                            <div class="row g-4">
+
+                                <div class="col-md-6">
+
+                                    <label class="fw-semibold">
+                                        Nombre Empresa
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="nombre"
+                                           th:value="${empresa.nombre}">
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <label class="fw-semibold">
+                                        Teléfono
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="telefono"
+                                           th:value="${empresa.telefono}">
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <label class="fw-semibold">
+                                        Correo
+                                    </label>
+
+                                    <input type="email"
+                                           class="form-control"
+                                           name="correo"
+                                           th:value="${empresa.correo}">
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <label class="fw-semibold">
+                                        WhatsApp
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="whatsapp"
+                                           th:value="${empresa.whatsapp}">
+
+                                </div>
+
+                                <div class="col-md-12">
+
+                                    <label class="fw-semibold">
+                                        Dirección
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="direccion"
+                                           th:value="${empresa.direccion}">
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <label class="fw-semibold">
+                                        Facebook
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="facebook"
+                                           th:value="${empresa.facebook}">
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <label class="fw-semibold">
+                                        Instagram
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="instagram"
+                                           th:value="${empresa.instagram}">
+
+                                </div>
+
+                                <div class="col-md-4">
+
+                                    <label class="fw-semibold">
+                                        TikTok
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="tiktok"
+                                           th:value="${empresa.tiktok}">
+
+                                </div>
+                                <!-- MARQUEE -->
+
+                                <div class="col-md-12">
+
+                                    <label class="fw-semibold">
+                                        Texto Marquee
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="marqueeTexto"
+                                           th:value="${empresa.marqueeTexto}">
+
+                                </div>
+
+                                <!-- CATEGORIAS -->
+
+                                <div class="col-md-3">
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="categoria1"
+                                           placeholder="Categoría 1"
+                                           th:value="${empresa.categoria1}">
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="categoria2"
+                                           placeholder="Categoría 2"
+                                           th:value="${empresa.categoria2}">
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="categoria3"
+                                           placeholder="Categoría 3"
+                                           th:value="${empresa.categoria3}">
+
+                                </div>
+
+                                <div class="col-md-3">
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="categoria4"
+                                           placeholder="Categoría 4"
+                                           th:value="${empresa.categoria4}">
+
+                                </div>
+
+                                <!-- IMAGEN CATEGORIAS -->
+
+                                <div class="col-md-12">
+
+                                    <label>
+                                        Imagen Categorías
+                                    </label>
+
+                                    <input type="file"
+                                           class="form-control"
+                                           name="imagenCategorias">
+
+                                </div>
+                                <div class="col-md-12">
+
+                                    <img id="previewCategorias"
+                                         th:if="${empresa.imagenCategorias != null}"
+                                         th:src="${empresa.imagenCategorias}"
+                                         class="img-thumbnail mt-2"
+                                         style="max-height:120px;">
+
+                                </div>
+
+                                <!-- BANNER -->
+
+                                <div class="col-md-12">
+
+                                    <label>
+                                        Título Banner
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="bannerTitulo"
+                                           th:value="${empresa.bannerTitulo}">
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <label>
+                                        Texto Botón Banner
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="bannerBoton"
+                                           th:value="${empresa.bannerBoton}">
+
+                                </div>
+                                <div class="col-md-6">
+
+                                    <label>
+                                        Link Botón Banner
+                                    </label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="bannerLink"
+                                           th:value="${empresa.bannerLink}">
+
+                                </div>
+                                <div class="col-md-12">
+
+                                    <label>
+                                        Imagen Banner
+                                    </label>
+
+                                    <input type="file"
+                                           class="form-control"
+                                           name="bannerImagen">
+
+                                </div>
+                                <div class="col-md-12">
+
+                                    <img id="previewBanner"
+                                         th:if="${empresa.bannerImagen != null}"
+                                         th:src="${empresa.bannerImagen}"
+                                         class="img-thumbnail mt-2"
+                                         style="max-height:120px;">
+
+                                </div>
+
+                                <div class="col-md-12">
+
+                                    <button type="submit"
+                                            class="btn btn-success">
+
+                                        <i class="bi bi-save"></i>
+                                        Guardar Cambios
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ===================================== -->
+        <!-- MODAL SLIDER -->
+        <!-- ===================================== -->
+
+        <div class="modal fade"
+             id="modalSlider">
+
+            <div class="modal-dialog modal-lg">
+
+                <div class="modal-content">
+
+                    <form id="formSlider"
+                          enctype="multipart/form-data">
+
+                        <div class="modal-header bg-primary text-white">
+
+                            <h5>
+                                Nuevo Slider
+                            </h5>
+
+                            <button type="button"
+                                    class="btn-close btn-close-white"
+                                    data-bs-dismiss="modal"></button>
+
+                        </div>
+
+                        <div class="modal-body">
+
+                            <div class="row g-3">
+
+                                <div class="col-md-6">
+
+                                    <label>Título</label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="titulo">
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <label>Subtítulo</label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="subtitulo">
+
+                                </div>
+
+                                <!-- TEXTO BOTON -->
+
+                                <div class="col-md-6">
+
+                                    <label>Texto Botón</label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="textoBoton">
+
+                                </div>
+
+                                <!-- LINK BOTON -->
+
+                                <div class="col-md-6">
+
+                                    <label>Link Botón</label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="linkBoton">
+
+                                </div>
+
+                                <div class="col-md-12">
+
+                                    <label>Imagen</label>
+
+                                    <input type="file"
+                                           class="form-control"
+                                           name="imagen">
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+
+                            <button class="btn btn-success">
+
+                                Guardar
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ===================================== -->
+        <!-- MODAL LOGO -->
+        <!-- ===================================== -->
+
+        <div class="modal fade"
+             id="modalLogo">
+
+            <div class="modal-dialog">
+
+                <div class="modal-content">
+
+                    <form id="formLogo"
+                          enctype="multipart/form-data">
+
+                        <div class="modal-header bg-dark text-white">
+
+                            <h5>
+                                Nuevo Logo
+                            </h5>
+
+                            <button type="button"
+                                    class="btn-close btn-close-white"
+                                    data-bs-dismiss="modal"></button>
+
+                        </div>
+
+                        <div class="modal-body">
+
+                            <div class="mb-3">
+
+                                <label>Nombre</label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       name="nombre">
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Imagen</label>
+
+                                <input type="file"
+                                       class="form-control"
+                                       name="imagen">
+
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+
+                            <button class="btn btn-success">
+
+                                Guardar
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ===================================== -->
+        <!-- MODAL EDITAR SLIDER -->
+        <!-- ===================================== -->
+
+        <div class="modal fade"
+             id="modalEditarSlider">
+
+            <div class="modal-dialog modal-lg">
+
+                <div class="modal-content">
+
+                    <form id="formEditarSlider"
+                          enctype="multipart/form-data">
+
+                        <input type="hidden"
+                               name="idSlider"
+                               id="edit_idSlider">
+
+                        <div class="modal-header bg-warning">
+
+                            <h5>
+                                Editar Slider
+                            </h5>
+
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"></button>
+
+                        </div>
+
+                        <div class="modal-body">
+
+                            <div class="row g-3">
+
+                                <div class="col-md-6">
+
+                                    <label>Título</label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="titulo"
+                                           id="edit_titulo">
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <label>Subtítulo</label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="subtitulo"
+                                           id="edit_subtitulo">
+
+                                </div>
+                                <div class="col-md-6">
+
+                                    <label>Texto Botón</label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="textoBoton"
+                                           id="edit_textoBoton">
+
+                                </div>
+
+                                <div class="col-md-6">
+
+                                    <label>Link Botón</label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           name="linkBoton"
+                                           id="edit_linkBoton">
+
+                                </div>
+                                <div class="col-md-12">
+
+                                    <label>Nueva Imagen</label>
+
+                                    <input type="file"
+                                           class="form-control"
+                                           name="imagen">
+
+                                </div>
+
+                                <div class="col-md-12">
+
+                                    <img id="previewSlider"
+                                         class="img-fluid rounded shadow">
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+
+                            <button class="btn btn-success">
+
+                                Actualizar
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ===================================== -->
+        <!-- MODAL EDITAR LOGO -->
+        <!-- ===================================== -->
+
+        <div class="modal fade"
+             id="modalEditarLogo">
+
+            <div class="modal-dialog">
+
+                <div class="modal-content">
+
+                    <form id="formEditarLogo"
+                          enctype="multipart/form-data">
+
+                        <input type="hidden"
+                               name="idLogo"
+                               id="edit_idLogo">
+
+                        <div class="modal-header bg-warning">
+
+                            <h5>
+                                Editar Logo
+                            </h5>
+
+                            <button type="button"
+                                    class="btn-close"
+                                    data-bs-dismiss="modal"></button>
+
+                        </div>
+
+                        <div class="modal-body">
+
+                            <div class="mb-3">
+
+                                <label>Nombre</label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       name="nombre"
+                                       id="edit_nombreLogo">
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Nueva Imagen</label>
+
+                                <input type="file"
+                                       class="form-control"
+                                       name="imagen">
+
+                            </div>
+
+                            <div class="text-center">
+
+                                <img id="previewLogo"
+                                     class="img-fluid rounded shadow"
+                                     style="max-height:150px;">
+
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+
+                            <button class="btn btn-success">
+
+                                Actualizar
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>

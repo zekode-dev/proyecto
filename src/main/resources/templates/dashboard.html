@@ -1,0 +1,305 @@
+<div class="container-fluid">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+    <style>
+        .card-urbana-indicador {
+            background: #ffffff;
+            border: 1px solid #eee;
+            border-radius: 0 !important; /* Cero curvas, full urban style */
+            transition: 0.3s;
+        }
+        .card-urbana-indicador:hover {
+            border-color: #111;
+            transform: translateY(-3px);
+        }
+        .border-indicador-danger {
+            border-left: 4px solid #dc3545 !important;
+        }
+        .border-indicador-dark {
+            border-left: 4px solid #111111 !important;
+        }
+        .table-urbana {
+            border: 1px solid #eee;
+        }
+        .table-urbana thead {
+            background-color: #fafafa;
+            border-bottom: 2px solid #111;
+        }
+        .table-urbana th {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            padding: 12px 8px;
+        }
+        .table-urbana td {
+            font-size: 13px;
+            padding: 14px 8px;
+        }
+        .badge-stock {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            border-radius: 0;
+            padding: 5px 10px;
+        }
+    </style>
+
+    <div class="d-flex justify-content-between align-items-center mb-4 pb-3" style="border-bottom: 1px solid #eee;">
+        <div>
+            <h2 class="fw-extrabold" style="letter-spacing: 1px; font-weight: 800; text-transform: uppercase; font-size: 26px;">
+                <i class="bi bi-grid-1x2-fill me-2" style="font-size: 22px;"></i> Panel de Control
+            </h2>
+            <p class="text-muted small mb-0" style="letter-spacing: 0.5px;">
+                Gestión estratégica de reposición, inventario y rendimiento de tienda.
+            </p>
+        </div>
+        <div>
+            <span class="badge bg-dark rounded-0 px-3 py-2 small" style="font-weight: 500; letter-spacing: 1px;">
+                <i class="bi bi-arrow-clockwise spinning me-1"></i> EN VIVO
+            </span>
+        </div>
+    </div>
+
+    <div class="row mb-2">
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card card-urbana-indicador border-indicador-dark shadow-sm p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="fw-bold mb-1" style="font-weight: 800;" th:text="${totalProductos != null ? totalProductos : '0'}">0</h2>
+                        <p class="text-muted small mb-0 text-uppercase fw-semibold" style="letter-spacing: 1px; font-size: 11px;">Products en Catálogo</p>
+                    </div>
+                    <i class="bi bi-box-seam fs-2 text-dark opacity-75"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card card-urbana-indicador border-indicador-dark shadow-sm p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="fw-bold mb-1" style="font-weight: 800;" th:text="${totalVentas != null ? 'S/ ' + totalVentas : 'S/ 0.00'}">S/ 0.00</h2>
+                        <p class="text-muted small mb-0 text-uppercase fw-semibold" style="letter-spacing: 1px; font-size: 11px;">Ingresos Totales</p>
+                    </div>
+                    <i class="bi bi-currency-exchange fs-2 text-dark opacity-75"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card card-urbana-indicador border-indicador-dark shadow-sm p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="fw-bold mb-1" style="font-weight: 800;" th:text="${totalClientes != null ? totalClientes : '0'}">0</h2>
+                        <p class="text-muted small mb-0 text-uppercase fw-semibold" style="letter-spacing: 1px; font-size: 11px;">Clientes Registrados</p>
+                    </div>
+                    <i class="bi bi-people fs-2 text-dark opacity-75"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="card card-urbana-indicador border-indicador-danger shadow-sm p-4" th:style="${stockBajo > 0} ? 'background: #fff5f5;' : ''">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="fw-bold mb-1 text-danger" style="font-weight: 800;" th:text="${stockBajo != null ? stockBajo : '0'}">0</h2>
+                        <p class="text-danger small mb-0 text-uppercase fw-bold" style="letter-spacing: 1px; font-size: 11px;">Alertas de Reposición</p>
+                    </div>
+                    <i class="bi bi-exclamation-triangle-fill fs-2 text-danger"></i>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-lg-7 mb-4">
+            <div class="card border rounded-0 shadow-sm" style="min-height: 280px;">
+                <div class="card-header bg-white border-bottom p-3">
+                    <h6 class="mb-0 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 12px;">
+                        <i class="bi bi-graph-up-arrow me-2"></i> Rendimiento de Ventas Histórico (En Vivo)
+                    </h6>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover align-middle table-urbana mb-0" style="border: none;">
+                        <thead>
+                        <tr style="border-bottom: 2px solid #111;">
+                            <th style="padding-left: 20px;">Período / Mes</th>
+                            <th class="text-end" style="padding-right: 20px;">Monto Total Facturado</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="fila : ${datosVentas}">
+                            <td style="padding-left: 20px;" class="fw-semibold text-uppercase">
+                                <i class="bi bi-calendar3 me-2 text-muted"></i>
+                                <span th:text="${fila[0]}">Mes</span>
+                            </td>
+                            <td class="text-end fw-bold text-dark" style="padding-right: 20px;">
+                                S/ <span th:text="${#numbers.formatDecimal(fila[1], 1, 2)}">0.00</span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(datosVentas)}">
+                            <td colspan="2" class="text-center text-muted py-4">No hay registros de ventas históricas.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5 mb-4">
+            <div class="card border rounded-0 shadow-sm" style="min-height: 280px;">
+                <div class="card-header bg-white border-bottom p-3">
+                    <h6 class="mb-0 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 12px;">
+                        <i class="bi bi-pie-chart me-2"></i> Stock por Categoría de Prenda
+                    </h6>
+                </div>
+                <div class="card-body p-0 table-responsive">
+                    <table class="table table-hover align-middle table-urbana mb-0" style="border: none;">
+                        <thead>
+                        <tr style="border-bottom: 2px solid #111;">
+                            <th style="padding-left: 20px;">Categoría</th>
+                            <th class="text-center" style="padding-right: 20px;">Unidades Disponibles</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="fila : ${datosCategorias}">
+                            <td style="padding-left: 20px;" class="fw-bold text-dark">
+                                <i class="bi bi-tag me-2 text-muted"></i>
+                                <span th:text="${fila[0]}">Categoría</span>
+                            </td>
+                            <td class="text-center">
+                                    <span class="badge bg-dark rounded-0 px-3 py-1 fw-semibold">
+                                        <span th:text="${fila[1]}">0</span> UND
+                                    </span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(datosCategorias)}">
+                            <td colspan="2" class="text-center text-muted py-4">No hay inventario registrado.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border rounded-0 shadow-sm mb-5">
+        <div class="card-header bg-dark text-white rounded-0 p-3">
+            <h6 class="mb-0 fw-bold text-uppercase d-flex justify-content-between align-items-center" style="letter-spacing: 1px; font-size: 12px;">
+                <span><i class="bi bi-shield-alert me-2"></i> Monitor de Alerta de Inventario Crítico</span>
+                <span class="small opacity-75">Prioridad de Reposición Urgente</span>
+            </h6>
+        </div>
+        <div class="card-body p-0 table-responsive">
+            <table class="table table-hover align-middle table-urbana mb-0">
+                <thead>
+                <tr>
+                    <th>Código / Ref</th>
+                    <th>Descripción de Prenda</th>
+                    <th>Categoría</th>
+                    <th class="text-center">Stock Actual</th>
+                    <th class="text-center">Estado de Alerta</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="p : ${productosCriticos}">
+                    <td class="fw-bold" th:text="'#' + ${p.idProducto}">#101</td>
+                    <td th:text="${p.nombre}">Polo Oversize Nero</td>
+                    <td th:text="${p.categoria != null ? p.categoria.nombre : 'Sin Categoría'}">Polos</td>
+                    <td class="text-center fw-bold" th:text="${p.stock}">5</td>
+                    <td class="text-center">
+                        <span th:if="${p.stock <= 5}" class="badge bg-danger badge-stock text-white">REPOSICIÓN INMEDIATA</span>
+                        <span th:if="${p.stock > 5}" class="badge bg-warning badge-stock text-dark">STOCK BAJO</span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(productosCriticos)}">
+                    <td colspan="5" class="text-center text-muted py-4">
+                        <i class="bi bi-check-circle-fill text-success me-2"></i> Todo el inventario se encuentra en niveles óptimos. No se requiere reposición.
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    // 🌟 Forzamos a que espere a que TODA la página y sus elementos existan en el navegador
+    document.addEventListener("DOMContentLoaded", function() {
+        setTimeout(function() {
+
+            // 📊 1. INYECTAR DATOS EN TABLA DE VENTAS HISTÓRICAS
+            fetch('/api/dashboard/grafico-ventas')
+                .then(res => {
+                    if (!res.ok) throw new Error("Error en respuesta de ventas");
+                    return res.json();
+                })
+                .then(data => {
+                    const tbody = document.getElementById('tablaVentasCuerpo');
+                    if (!tbody) return;
+                    tbody.innerHTML = ''; // Limpiar mensaje de "Cargando..."
+
+                    if (!data.labels || data.labels.length === 0 || data.labels[0] === 'Sin Ventas') {
+                        tbody.innerHTML = `<tr><td colspan="2" class="text-center text-muted py-4">No hay registros de ventas activas.</td></tr>`;
+                        return;
+                    }
+
+                    data.labels.forEach((mes, index) => {
+                        const val = data.valores[index];
+                        const monto = val !== undefined && val !== null ? Number(val).toFixed(2) : '0.00';
+                        const fila = `
+                            <tr>
+                                <td style="padding-left: 20px;" class="fw-semibold text-uppercase"><i class="bi bi-calendar3 me-2 text-muted"></i> ${mes}</td>
+                                <td class="text-end fw-bold text-dark" style="padding-right: 20px;">S/ ${monto}</td>
+                            </tr>
+                        `;
+                        tbody.insertAdjacentHTML('beforeend', fila);
+                    });
+                })
+                .catch(err => {
+                    console.error("Error cargando tabla de ventas:", err);
+                    const tbody = document.getElementById('tablaVentasCuerpo');
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="2" class="text-center text-danger py-4">Error al conectar con la base de datos de ventas.</td></tr>`;
+                });
+
+            // 📊 2. INYECTAR DATOS EN TABLA DE STOCK POR CATEGORÍA
+            fetch('/api/dashboard/grafico-categorias')
+                .then(res => {
+                    if (!res.ok) throw new Error("Error en respuesta de categorías");
+                    return res.json();
+                })
+                .then(data => {
+                    const tbody = document.getElementById('tablaCategoriasCuerpo');
+                    if (!tbody) return;
+                    tbody.innerHTML = ''; // Limpiar mensaje de "Procesando..."
+
+                    if (!data.labels || data.labels.length === 0 || data.labels[0] === 'Sin Stock') {
+                        tbody.innerHTML = `<tr><td colspan="2" class="text-center text-muted py-4">No hay inventario registrado.</td></tr>`;
+                        return;
+                    }
+
+                    data.labels.forEach((categoria, index) => {
+                        const stock = data.valores[index] || 0;
+                        const fila = `
+                            <tr>
+                                <td style="padding-left: 20px;" class="fw-bold text-dark"><i class="bi bi-tag me-2 text-muted"></i> ${categoria}</td>
+                                <td class="text-center"><span class="badge bg-dark rounded-0 px-3 py-1 fw-semibold">${stock} UND</span></td>
+                            </tr>
+                        `;
+                        tbody.insertAdjacentHTML('beforeend', fila);
+                    });
+                })
+                .catch(err => {
+                    console.error("Error cargando tabla de categorías:", err);
+                    const tbody = document.getElementById('tablaCategoriasCuerpo');
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="2" class="text-center text-danger py-4">Error al conectar con el inventario.</td></tr>`;
+                });
+
+        }, 200); // Pequeña pausa técnica de 200ms para asegurar renderizado de las etiquetas
+    });
+</script>

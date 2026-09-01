@@ -1,0 +1,453 @@
+<div xmlns:th="http://www.thymeleaf.org">
+
+    <div class="content-header">
+        <h1>LISTADO DE VENTAS</h1>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header bg-light">
+            <h3 class="card-title text-dark fw-bold mb-0" style="font-size: 1rem;">
+                <i class="bi bi-filter-square text-primary"></i> Filtrar Registros
+            </h3>
+        </div>
+
+        <!-- 🌟 UNA SOLA FILA TOTALMENTE DISTRIBUIDA Y SIN DUPLICADOS -->
+        <div class="row g-2 mb-3 px-2 pt-2">
+            <!-- 1. MONTO GENERAL (PRIMARY) -->
+            <div class="col-md-4 col-lg-2-4">
+                <div class="card border-0 shadow-sm bg-primary text-white h-100">
+                    <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-uppercase mb-1 small fw-bold" style="opacity: 0.85;" id="lblCardFecha">Monto General</h6>
+                            <h3 class="mb-0 fw-bold" style="font-size: 1.35rem;" id="cardMontoTotal">S/ 0.00</h3>
+                            <small class="d-block mt-1 style-sub" style="opacity: 0.9;"><i class="bi bi-receipt"></i> <span id="cardCantTotal">0</span> Ventas</small>
+                        </div>
+                        <div class="fs-2" style="opacity: 0.3;"><i class="bi bi-cash-stack"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. VENTAS POR SISTEMA (DARK) -->
+            <div class="col-md-4 col-lg-2-4">
+                <div class="card border-0 shadow-sm bg-dark text-white h-100">
+                    <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-uppercase mb-1 small fw-bold" style="opacity: 0.85;">Por Sistema</h6>
+                            <h3 class="mb-0 fw-bold" style="font-size: 1.35rem;" id="cardMontoSistema">S/ 0.00</h3>
+                            <small class="d-block mt-1 style-sub" style="opacity: 0.9;"><i class="bi bi-pc-display"></i> <span id="cardCantSistema">0</span> Presenciales</small>
+                        </div>
+                        <div class="fs-2" style="opacity: 0.3;"><i class="bi bi-laptop"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. VENTAS POR INTERNET / WEB (INFO) -->
+            <div class="col-md-4 col-lg-2-4">
+                <div class="card border-0 shadow-sm bg-info text-white h-100" style="background-color: #0dcaf0 !important;">
+                    <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-uppercase mb-1 small fw-bold" style="opacity: 0.85; color: #111 !important;">Por Internet</h6>
+                            <h3 class="mb-0 fw-bold text-dark" style="font-size: 1.35rem;" id="cardMontoWeb">S/ 0.00</h3>
+                            <small class="d-block mt-1 style-sub text-dark" style="opacity: 0.9;"><i class="bi bi-globe"></i> <span id="cardCantWeb">0</span> En Línea</small>
+                        </div>
+                        <div class="fs-2 text-dark" style="opacity: 0.25;"><i class="bi bi-globe"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. APROBADAS GENERAL (SUCCESS) -->
+            <div class="col-md-6 col-lg-2-4">
+                <div class="card border-0 shadow-sm bg-success text-white h-100">
+                    <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-uppercase mb-1 small fw-bold" style="opacity: 0.85;">Aprobadas</h6>
+                            <h3 class="mb-0 fw-bold" style="font-size: 1.35rem;" id="cardMontoAprobado">S/ 0.00</h3>
+                            <small class="d-block mt-1 style-sub" style="opacity: 0.9;"><i class="bi bi-check-circle"></i> <span id="cardCantAprobado">0</span> Aprobadas</small>
+                        </div>
+                        <div class="fs-2" style="opacity: 0.3;"><i class="bi bi-check-circle-fill"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. POR VERIFICAR EN WEB (PURPLE) -->
+            <div class="col-md-6 col-lg-2-4">
+                <div class="card border-0 shadow-sm bg-purple text-white h-100" style="background-color: #6f42c1 !important;">
+                    <div class="card-body p-3 d-flex align-items-center justify-content-between">
+                        <div>
+                            <h6 class="text-uppercase mb-1 small fw-bold" style="opacity: 0.85;">Pendientes</h6>
+                            <h3 class="mb-0 fw-bold" style="font-size: 1.35rem;" id="cardMontoPendiente">S/ 0.00</h3>
+                            <small class="d-block mt-1 style-sub" style="opacity: 0.9;"><i class="bi bi-phone"></i> <span id="cardCantPendiente">0</span> En Espera</small>
+                        </div>
+                        <div class="fs-2" style="opacity: 0.3;"><i class="bi bi-phone-vibrate"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FILTROS DE BUSQUEDA -->
+        <div class="card-body py-2">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold mb-1">Fecha Desde:</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
+                        <input type="date" id="filtroFechaDesde" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-semibold mb-1">Fecha Hasta:</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="bi bi-calendar-date"></i></span>
+                        <input type="date" id="filtroFechaHasta" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small fw-semibold mb-1">Buscador Rápido:</label>
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" id="filtroBuscadorGeneral" class="form-control" placeholder="Buscar por Cliente, DNI, Tipo...">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-secondary btn-sm w-100 fw-bold" onclick="limpiarFiltrosVentas()">
+                        <i class="bi bi-arrow-counterclockwise"></i> Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <button class="btn btn-success btn-sm float-end" data-bs-toggle="modal" data-bs-target="#modalVenta">
+                <i class="bi bi-plus-circle"></i> Nueva Venta
+            </button>
+        </div>
+
+        <div class="card-body">
+            <table id="tabla_ventas" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Fecha</th>
+                    <th>Cliente</th>
+                    <th>DNI</th>
+                    <th>Método Pago</th>
+                    <th>Tipo Pago</th>
+                    <th>Total</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="v,iter : ${ventas}"
+                    th:classappend="${alertasVencimiento[v.idVenta]} ? 'table-danger border-start border-danger border-4' : ''"
+                    class="fila-venta-registro">
+                    <td th:text="${iter.index+1}"></td>
+                    <td th:text="${#temporals.format(v.fecha,'dd/MM/yyyy HH:mm')}" th:data-fecha="${#temporals.format(v.fecha,'yyyy-MM-dd')}"></td>
+
+                    <td th:text="${v.cliente.nombres
++ (v.cliente.apellido_Paterno != null ? ' ' + v.cliente.apellido_Paterno : '')
++ (v.cliente.apellido_Materno != null ? ' ' + v.cliente.apellido_Materno : '')}"></td>
+
+                    <td th:text="${v.cliente.dni}"></td>
+                    <td th:text="${v.metodoPago}"></td>
+                    <td>
+                        <span th:if="${v.tipoPago=='CONTADO'}" class="badge bg-success">CONTADO</span>
+                        <span th:if="${v.tipoPago=='CREDITO'}" class="badge bg-warning text-dark">CRÉDITO</span>
+                    </td>
+                    <td>S/ <span th:text="${v.total}"></span></td>
+
+                    <td>
+                        <span th:if="${v.estado == 1}" class="badge bg-success">Aprobado</span>
+                        <span th:if="${v.estado == 2}" class="badge bg-warning text-dark">Pendiente</span>
+                        <span th:if="${v.estado == 3}" class="badge bg-purple text-white" style="background-color: #6f42c1;">Por Verificar (Web)</span>
+                        <span th:if="${v.estado == 0}" class="badge bg-danger">Inactivo / Eliminado</span>
+                    </td>
+
+                    <td>
+                        <div class="btn-group" role="group">
+                            <button th:if="${v.estado == 3}"
+                                    class="btn btn-warning btn-sm fw-bold text-dark"
+                                    th:data-id="${v.idVenta}"
+                                    th:data-codigo="${v.codigoOperacion}"
+                                    th:data-cliente="${v.cliente.nombres}"
+                                    th:data-total="${v.total}"
+                                    th:data-modo="'PROCESAR'"
+                                    onclick="abrirModalVerificacionWeb(this)"
+                                    title="Verificar y Aprobar Pago Web">
+                                <i class="bi bi-shield-check"></i>
+                            </button>
+
+                            <button th:if="${v.estado == 1 && v.usuarioAprobacion != null}"
+                                    class="btn btn-success btn-sm fw-bold text-white"
+                                    th:data-id="${v.idVenta}"
+                                    th:data-codigo="${v.codigoOperacion}"
+                                    th:data-cliente="${v.cliente.nombres}"
+                                    th:data-total="${v.total}"
+                                    th:data-modo="'VER_AUDITORIA'"
+                                    th:data-admin="${v.usuarioAprobacion}"
+                                    th:data-fechaauditoria="${#temporals.format(v.fechaAprobacion,'dd/MM/yyyy HH:mm')}"
+                                    onclick="abrirModalVerificacionWeb(this)"
+                                    title="Ver detalles de aprobación web">
+                                <i class="bi bi-person-check-fill"></i>
+                            </button>
+
+                            <button class="btn btn-info btn-sm text-white" th:onclick="'verVoucher(' + ${v.idVenta} + ')'" title="Visualizar Voucher">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                            <button th:if="${v.tipoPago=='CREDITO'}" class="btn btn-dark btn-sm" th:onclick="'verCuotasVenta(' + ${v.idVenta} + ')'" title="Ver Cuotas">
+                                <i class="bi bi-calendar3"></i>
+                            </button>
+                            <button th:if="${v.estado != 0}" class="btn btn-danger btn-sm" th:onclick="'eliminarVenta(' + ${v.idVenta} + ')'" title="Eliminar / Anular Venta">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalVerCuotas" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content shadow-lg border-0">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title">
+                        <i class="bi bi-wallet2 text-warning"></i> Control de Créditos y Cuotas
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body bg-light" style="max-height: 70vh;">
+                    <div class="p-2 mb-3 bg-white rounded border shadow-sm">
+                        <span class="text-muted small uppercase fw-bold d-block">Titular del Crédito</span>
+                        <h6 class="mb-1 text-primary" id="titularCuotaNombre">---</h6>
+                        <small class="text-muted"><i class="bi bi-card-text"></i> DNI: <span id="titularCuotaDni">---</span></small>
+                    </div>
+                    <div id="seccionPagarCuota" class="p-3 mb-3 bg-warning-subtle rounded border border-warning d-none">
+                        <h6 class="fw-bold text-dark mb-2"><i class="bi bi-cash-coin"></i> Registrar Pago de Cuota N° <span id="txtNroCuota">0</span></h6>
+                        <input type="hidden" id="idCuotaAProcesar">
+                        <div class="row g-2">
+                            <div class="col-md-5">
+                                <select id="modalMetodoPagoCuota" class="form-select form-select-sm">
+                                    <option value="EFECTIVO">Efectivo</option>
+                                    <option value="YAPE">Yape</option>
+                                    <option value="PLIN">Plin</option>
+                                    <option value="TRANSFERENCIA">Transferencia</option>
+                                    <option value="TARJETA">Tarjeta</option>
+                                </select>
+                            </div>
+                            <div class="col-md-5">
+                                <input type="text" id="modal危機opCuota" class="form-control form-select-sm d-none" placeholder="Código de Operación">
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-success btn-sm w-100" onclick="procesarPagoCuotaIndividual()">Pagar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3" id="contenedorCardsCuotas"></div>
+                </div>
+                <div class="modal-footer bg-white">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar Ventana</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="modalVenta" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="bi bi-cart-plus"></i> Nueva Venta</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white"><i class="bi bi-person-badge"></i> Datos del Cliente</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="fw-semibold">DNI</label>
+                                <input type="text" id="dniCliente" class="form-control" maxlength="8">
+                            </div>
+                            <div class="col-md-2">
+                                <label>&nbsp;</label>
+                                <button type="button" class="btn btn-primary w-100" onclick="buscarCliente()">Buscar</button>
+                            </div>
+                            <div class="col-md-7">
+                                <label class="fw-semibold">Cliente</label>
+                                <input type="text" id="nombreCliente" class="form-control" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white"><i class="bi bi-box-seam"></i> Productos</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="fw-semibold">Producto</label>
+                                <select id="productoVenta" class="form-select">
+                                    <option value="">Seleccione</option>
+                                    <option th:each="p : ${productos}" th:value="${p.idProducto}" th:data-precio="${p.precio}" th:text="${p.nombre}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="fw-semibold">Talla</label>
+                                <select id="tallaVenta" class="form-select"><option value="">Seleccione talla</option></select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="fw-semibold">Stock</label>
+                                <input type="text" id="stockVenta" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="fw-semibold">Precio</label>
+                                <input type="text" id="precioVenta" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="fw-semibold">Cantidad</label>
+                                <input type="number" id="cantidadVenta" class="form-control" min="1" value="1">
+                            </div>
+                            <div class="col-md-2 align-self-end">
+                                <button class="btn btn-success w-100" onclick="agregarProductoVenta()">Agregar</button>
+                            </div>
+                        </div>
+                        <hr>
+                        <table class="table table-bordered table-hover mt-3">
+                            <thead class="table-dark">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Talla / Color</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Subtotal</th>
+                                <th width="80">Eliminar</th>
+                            </tr>
+                            </thead>
+                            <tbody id="detalleVentaBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-warning"><i class="bi bi-credit-card"></i> Forma de Pago</div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="fw-semibold">Método Pago</label>
+                                <select id="metodoPago" class="form-select">
+                                    <option value="">Seleccione</option>
+                                    <option value="EFECTIVO">Efectivo</option>
+                                    <option value="YAPE">Yape</option>
+                                    <option value="PLIN">Plin</option>
+                                    <option value="TRANSFERENCIA">Transferencia</option>
+                                    <option value="TARJETA">Tarjeta</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-none" id="divCodigoOperacion">
+                                <label class="fw-semibold">Código Operación</label>
+                                <input type="text" id="codigoOperacion" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="fw-semibold">Estado Pago</label>
+                                <input type="text" id="estadoPago" class="form-control text-center fw-bold" value="APROBADO" readonly>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="fw-semibold">Tipo Pago</label>
+                                <select id="tipoPago" class="form-select" disabled>
+                                    <option value="CONTADO">CONTADO</option>
+                                    <option value="CREDITO">CRÉDITO</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-none" id="divCuotas">
+                                <label class="fw-semibold">Número Cuotas</label>
+                                <input type="number" id="cuotas" min="1" value="1" disabled class="form-control">
+                            </div>
+                            <div class="col-md-3 d-none" id="divMontoCuota">
+                                <label class="fw-semibold">Monto por Cuota</label>
+                                <input type="text" id="montoCuota" readonly class="form-control">
+                            </div>
+                            <div class="col-md-3 d-none" id="divFechaVencimiento">
+                                <label class="fw-semibold">Fecha 1er Vencimiento</label>
+                                <input type="date" id="fechaPrimerVencimiento" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow">
+                    <div class="card-header bg-dark text-white"><i class="bi bi-receipt"></i> Resumen de Venta</div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4"><h6>Subtotal</h6><h4>S/ <span id="subtotalVenta">0.00</span></h4></div>
+                            <div class="col-md-4"><h6>IGV</h6><h4>S/ <span id="igvVenta">0.00</span></h4></div>
+                            <div class="col-md-4"><h6>Total</h6><h3 class="text-success">S/ <span id="totalVentaTexto">0.00</span></h3></div>
+                        </div>
+                        <input type="hidden" id="totalVenta">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button class="btn btn-success" onclick="guardarVenta()"><i class="bi bi-check-circle"></i> Registrar Venta</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalVerificarPagoWeb" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0">
+            <div class="modal-header bg-purple text-white" id="headerModalWeb" style="background-color: #6f42c1;">
+                <h5 class="modal-title fw-bold">
+                    <i class="bi bi-patch-check"></i> <span id="lblTituloModalWeb">Confirmación de Operación Web</span>
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body bg-light">
+                <input type="hidden" id="idVentaVerificarHidden">
+                <div class="card p-3 mb-0 border shadow-sm rounded bg-white">
+                    <div class="mb-2">
+                        <span class="text-muted small fw-bold text-uppercase d-block">Cliente Web</span>
+                        <div class="fw-bold text-dark" id="txtClienteWebVerificar" style="font-size: 1.1rem;">---</div>
+                    </div>
+                    <div class="mb-2">
+                        <span class="text-muted small fw-bold text-uppercase d-block">Monto de la Venta</span>
+                        <div class="fw-bold text-success" id="txtTotalWebVerificar" style="font-size: 1.2rem;">S/ 0.00</div>
+                    </div>
+                    <hr class="my-2">
+                    <div class="p-2 bg-dark rounded border text-center text-warning" style="letter-spacing: 1px;">
+                        <span class="text-muted small fw-bold text-uppercase d-block" style="color: #aaa !important;">Código de Operación Enviado</span>
+                        <h4 class="fw-bold mb-0 pt-1" id="txtCodigoWebVerificar">--------</h4>
+                    </div>
+
+                    <div id="divAuditoriaWeb" class="mt-3 p-2 bg-success-subtle border border-success rounded d-none">
+                        <span class="text-success small fw-bold text-uppercase d-block"><i class="bi bi-info-circle"></i> Registro de Verificación:</span>
+                        <div class="small text-dark mt-1">
+                            <strong>Aprobado por:</strong> <span id="auditUser">---</span> <br>
+                            <strong>Fecha / Hora:</strong> <span id="auditFecha">---</span>
+                        </div>
+                    </div>
+
+                    <p id="txtAlertaVerificar" class="text-muted small text-center mt-3 mb-0">
+                        <i class="bi bi-info-circle-fill text-primary"></i> Verifica en tu celular que el código de operación coincida en tu app de banca, Yape o Plin antes de confirmar.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cerrar</button>
+                <!-- NUEVO: Botón de Rechazar Transacción -->
+                <button type="button" class="btn btn-danger btn-sm fw-bold" id="btnRechazarVentaWebFinal" onclick="ejecutarRechazoVentaWebFinal()">
+                    <i class="bi bi-x-circle"></i> Rechazar Operación
+                </button>
+                <button type="button" class="btn btn-success btn-sm fw-bold" id="btnAprobarVentaWebFinal" onclick="ejecutarAprobacionVentaWebFinal()">
+                    <i class="bi bi-check2-circle"></i> Aprobar Transacción
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

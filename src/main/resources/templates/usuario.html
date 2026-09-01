@@ -1,0 +1,330 @@
+<div xmlns:th="http://www.thymeleaf.org">
+    <div class="content-header">
+        <h1>LISTADO USUARIO</h1>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <button class="btn btn-primary btn-sm float-end"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalUsuario">
+                Nuevo Usuario
+            </button>
+        </div>
+
+        <div class="card-body">
+            <table id="tabla_usuario_serverside" class="table table-bordered table-striped">
+
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>DNI</th>
+                    <th>Nombres</th>
+                    <th>Usuario</th>
+                    <th>Correo</th>
+                    <th>Fecha</th>
+                    <th>Contacto</th>
+                    <th>Cargo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="u, iter : ${usuarios}">
+                    <td th:text="${iter.index + 1}"></td>
+                    <td th:text="${u.dni}"></td>
+                    <td th:text="${u.nombres}"></td>
+                    <td th:text="${u.usuario}"></td>
+                    <td th:text="${u.correo}"></td>
+
+                    <td th:text="${u.fechaRegistro != null ? #temporals.format(u.fechaRegistro, 'yyyy-MM-dd HH:mm') : ''}"></td>
+
+                    <td th:text="${u.telefono}"></td>
+
+                    <td th:text="${u.rol != null ? u.rol.nombre : 'Sin rol'}"></td>
+
+                    <td>
+                        <span th:if="${u.estado == 1}" class="badge bg-success">Activo</span>
+                        <span th:if="${u.estado == 0}" class="badge bg-danger">Inactivo</span>
+                    </td>
+
+                    <td>
+
+                        <!--  USUARIO ACTIVO -->
+                        <div th:if="${u.estado == 1}">
+                            <button class="btn btn-warning btn-sm"
+                                    onclick="editarUsuario(this)"
+                                    th:data-id="${u.idUsuario}"
+                                    th:data-dni="${u.dni}"
+                                    th:data-nombres="${u.nombres}"
+                                    th:data-usuario="${u.usuario}"
+                                    th:data-correo="${u.correo}"
+                                    th:data-telefono="${u.telefono}"
+                                    th:data-rol="${u.rol != null ? u.rol.idRol : ''}">
+                                <i class="bi bi-pencil"  ></i>
+                            </button>
+
+                            <div th:if="${u.idUsuario != 1}">
+
+                                <button class="btn btn-danger btn-sm"
+                                        onclick="eliminarUsuario(this)"
+                                        th:data-id="${u.idUsuario}">
+
+                                    <i class="bi bi-trash"></i>
+
+                                </button>
+
+                            </div>
+
+                            <div th:if="${u.idUsuario == 1}">
+
+                                <button class="btn btn-secondary btn-sm"
+                                        disabled
+                                        title="Administrador principal">
+
+                                    <i class="bi bi-shield-lock"></i>
+
+                                </button>
+
+                            </div>
+                        </div>
+
+                        <!-- USUARIO INACTIVO -->
+                        <div th:if="${u.estado == 0}">
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="bi bi-trash"></i>
+                            </button>
+
+                            <!--  REACTIVAR -->
+                            <button class="btn btn-success btn-sm"
+                                    onclick="reactivarUsuario(this)"
+                                    th:data-id="${u.idUsuario}">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </div>
+
+                    </td>
+                </tr>
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+        <!-- MODAL CREAR USUARIO -->
+        <div class="modal fade" id="modalUsuario" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content shadow-lg rounded-3">
+
+                    <form  id="formUsuario">
+
+                        <!-- HEADER -->
+                        <div class="modal-header bg-primary text-white">
+                            <h5 class="modal-title">
+                                <i class="bi bi-person-plus"></i> Registrar Usuario
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <!-- BODY -->
+                        <div class="modal-body px-4 py-3">
+
+                            <div class="row g-3">
+
+                                <!-- DNI -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">DNI</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                        <input type="text" name="dni" id="reg_dni" class="form-control"
+                                               pattern="[0-9]{8}" maxlength="8" required
+                                               onkeypress="return soloNumeros(event)">
+                                        <button type="button" class="btn btn-dark" onclick="consultarDniUsuario()">
+                                            <i class="bi bi-search"></i> Reniec
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Nombres</label>
+                                    <input type="text" name="nombres" id="reg_nombres" class="form-control" required
+                                           onkeypress="return soloLetras(event)">
+                                </div>
+
+                                <!-- TELEFONO -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Teléfono</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                                        <input type="text" name="telefono" class="form-control"
+                                               pattern="[0-9]{9}" maxlength="9">
+                                    </div>
+                                </div>
+
+                                <!-- ROL -->
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Rol</label>
+                                    <select name="idRol" class="form-select" required>
+                                        <option value="">Seleccione</option>
+                                        <option th:each="r : ${roles}"
+                                                th:value="${r.idRol}"
+                                                th:text="${r.nombre}">
+                                        </option>
+                                    </select>
+                                </div>
+
+
+
+                                <!-- USUARIO -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Usuario</label>
+                                    <input type="text" name="usuario" class="form-control" required>
+                                </div>
+
+                                <!-- CORREO -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Correo</label>
+                                    <input type="email" name="correo" class="form-control">
+                                </div>
+
+                                <!-- PASSWORD -->
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">Contraseña</label>
+                                    <input type="password" name="password" class="form-control" required>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- FOOTER -->
+                        <div class="modal-footer px-4">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save"></i> Guardar
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- MODAL EDITAR USUARIO -->
+        <div class="modal fade" id="modalEditarUsuario" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content shadow-lg">
+
+                    <form id="formEditarUsuario">
+
+                        <input type="hidden" name="idUsuario" id="edit_id">
+
+                        <div class="modal-header bg-warning text-dark">
+                            <h5 class="modal-title">
+                                <i class="bi bi-pencil"></i> Editar Usuario
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+
+                        <div class="modal-body px-4 py-3">
+
+                            <div class="row g-3">
+
+                                <div class="col-md-4">
+                                    <label>DNI</label>
+                                    <input type="text" name="dni" id="edit_dni" class="form-control" readonly>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>Teléfono</label>
+                                    <input type="text" name="telefono" id="edit_telefono" class="form-control" pattern="[0-9]{9}" maxlength="9">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label>Rol</label>
+                                    <select name="idRol" id="edit_rol" class="form-select">
+                                        <option th:each="r : ${roles}"
+                                                th:value="${r.idRol}"
+                                                th:text="${r.nombre}">
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <label>Nombres</label>
+                                    <input type="text" name="nombres" id="edit_nombres" class="form-control" readonly>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>Usuario</label>
+                                    <input type="text" name="usuario" id="edit_usuario" class="form-control">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>Correo</label>
+                                    <input type="email" name="correo" id="edit_correo" class="form-control">
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label>Nueva contraseña</label>
+                                    <input type="password" name="password" class="form-control">
+                                    <small class="text-muted">Dejar vacío para no cambiar</small>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-success">Actualizar</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL ELIMINAR -->
+        <div class="modal fade" id="modalEliminarUsuario" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+
+
+                    <form id="formEliminarUsuario">
+
+                        <input type="hidden" name="idUsuario" id="delete_id">
+
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title">
+                                <i class="bi bi-trash"></i> Eliminar Usuario
+                            </h5>
+                        </div>
+
+                        <div class="modal-body text-center">
+                            <p>¿Estás seguro que deseas eliminar este usuario?</p>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Cancelar
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+</div>

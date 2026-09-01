@@ -1,0 +1,223 @@
+<div xmlns:th="http://www.thymeleaf.org">
+    <div class="content-header">
+        <h1>LISTADO CLIENTES</h1>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <button class="btn btn-primary btn-sm float-end"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalCliente">
+                Nuevo Cliente
+            </button>
+        </div>
+
+        <div class="card-body">
+            <table id="tabla_clientes" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>DNI</th>
+                    <th>Nombres</th>
+                    <th>Ap. Paterno</th>
+                    <th>Ap. Materno</th>
+                    <th>Teléfono</th>
+                    <th>Correo</th>
+                    <th>Dirección</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="c, iter : ${clientes}">
+                    <td th:text="${iter.index + 1}"></td>
+                    <td th:text="${c.dni}"></td>
+                    <td th:text="${c.nombres}"></td>
+                    <td th:text="${c.apellido_Paterno}"></td>
+                    <td th:text="${c.apellido_Materno}"></td>
+                    <td th:text="${c.telefono}"></td>
+                    <td th:text="${c.correo}"></td>
+                    <td th:text="${c.direccion}"></td>
+                    <td>
+                        <span th:if="${c.estado == 1}" class="badge bg-success">Activo</span>
+                        <span th:if="${c.estado == 0}" class="badge bg-danger">Inactivo</span>
+                    </td>
+
+                    <td>
+                        <div th:if="${c.estado == 1}">
+                            <button class="btn btn-warning btn-sm"
+                                    onclick="editarCliente(this)"
+                                    th:data-id="${c.idCliente}"
+                                    th:data-dni="${c.dni}"
+                                    th:data-nombres="${c.nombres}"
+                                    th:data-apaterno="${c.apellido_Paterno}"
+                                    th:data-amaterno="${c.apellido_Materno}"
+                                    th:data-telefono="${c.telefono}"
+                                    th:data-correo="${c.correo}"
+                                    th:data-direccion="${c.direccion}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <!--<button class="btn btn-danger btn-sm"
+                                    onclick="eliminarCliente(this)"
+                                    th:data-id="${c.idCliente}">
+                                <i class="bi bi-trash"></i>
+                            </button>-->
+                        </div>
+
+                        <div th:if="${c.estado == 0}">
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="bi bi-trash"></i>
+                            </button>
+
+                            <button class="btn btn-success btn-sm"
+                                    onclick="reactivarCliente(this)"
+                                    th:data-id="${c.idCliente}">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalCliente" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content shadow-lg rounded-3">
+                <form id="formCliente">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            <i class="bi bi-person-plus"></i> Registrar Cliente
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body px-4 py-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">DNI</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-card-text"></i></span>
+                                    <input type="text" name="dni" id="reg_dni" class="form-control"
+                                           pattern="[0-9]{8}" maxlength="8" required>
+                                    <button type="button" class="btn btn-dark" onclick="consultarDniReniec()">
+                                        <i class="bi bi-search"></i> Reniec
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Teléfono</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                                    <input type="text" name="telefono" class="form-control"
+                                           pattern="[0-9]{9}" maxlength="9">
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Nombres</label>
+                                <input type="text" name="nombres" id="reg_nombres" class="form-control" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Apellido Paterno</label>
+                                <input type="text" name="apellido_Paterno" id="reg_apellido_paterno" class="form-control" required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Apellido Materno</label>
+                                <input type="text" name="apellido_Materno" id="reg_apellido_materno" class="form-control" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Correo</label>
+                                <input type="email" name="correo" class="form-control">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Dirección</label>
+                                <input type="text" name="direccion" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer px-4">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-save"></i> Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalEditarCliente" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content shadow-lg">
+                <form id="formEditarCliente">
+                    <input type="hidden" name="idCliente" id="edit_id_cliente">
+
+                    <div class="modal-header bg-warning text-dark">
+                        <h5 class="modal-title">
+                            <i class="bi bi-pencil"></i> Editar Cliente
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body px-4 py-3">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">DNI (No editable)</label>
+                                <input type="text" id="edit_dni" class="form-control bg-light" disabled>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Teléfono</label>
+                                <input type="text" name="telefono" id="edit_telefono" class="form-control" maxlength="9">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Nombres (No editable)</label>
+                                <input type="text" id="edit_nombres" class="form-control bg-light" disabled>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Apellido Paterno (No editable)</label>
+                                <input type="text" id="edit_apellido_paterno" class="form-control bg-light" disabled>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Apellido Materno (No editable)</label>
+                                <input type="text" id="edit_apellido_materno" class="form-control bg-light" disabled>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Correo (Debe ser @gmail.com)</label>
+                                <input type="email" name="correo" id="edit_correo" class="form-control">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Dirección</label>
+                                <input type="text" name="direccion" id="edit_direccion" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-success">Actualizar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

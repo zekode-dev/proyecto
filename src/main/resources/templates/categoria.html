@@ -1,0 +1,287 @@
+<div xmlns:th="http://www.thymeleaf.org">
+
+    <div class="content-header">
+        <h1>LISTADO CATEGORIAS</h1>
+    </div>
+
+    <div class="card">
+
+        <div class="card-header">
+            <button class="btn btn-primary btn-sm float-end"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalCrear">
+                Nueva Categoria
+            </button>
+        </div>
+
+        <div class="card-body">
+
+            <table id="tabla_categoria_serverside" class="table table-bordered table-striped">
+
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="c, iter : ${categorias}">
+
+                    <td th:text="${iter.index + 1}"></td>
+                    <td th:text="${c.nombre}"></td>
+                    <td th:text="${c.descripcion}"></td>
+                    <td>
+                        <span th:if="${c.estado == 1}" class="badge bg-success">Activo</span>
+                        <span th:if="${c.estado == 0}" class="badge bg-danger">Inactivo</span>
+                    </td>
+
+                    <td>
+
+                        <!--  ROL ACTIVO -->
+                        <div th:if="${c.estado == 1}">
+
+                            <button class="btn btn-warning btn-sm"
+                                    onclick="editarCategoria(this)"
+                                    th:data-id="${c.idCategoria}"
+                                    th:data-nombre="${c.nombre}"
+                                    th:data-descripcion="${c.descripcion}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button class="btn btn-danger btn-sm"
+                                    onclick="eliminarCategoria(this)"
+                                    th:data-id="${c.idCategoria}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+
+                        </div>
+
+                        <!--  ROL INACTIVO -->
+                        <div th:if="${c.estado == 0}">
+
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button class="btn btn-secondary btn-sm" disabled>
+                                <i class="bi bi-trash"></i>
+                            </button>
+
+                            <!--  REACTIVAR -->
+                            <button class="btn btn-success btn-sm"
+                                    onclick="reactivarCategoria(this)"
+                                    th:data-id="${c.idCategoria}">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+    <!-- ================= MODAL CREAR ================= -->
+    <div class="modal fade" id="modalCrear" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content shadow-lg rounded-3">
+
+                <form id="formCategoria">
+
+                    <!-- HEADER -->
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">
+                            <i class="bi bi-tags"></i> Nueva Categoría
+                        </h5>
+
+                        <button type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="modal">
+                        </button>
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="modal-body px-4 py-3">
+
+                        <div class="row g-3">
+
+                            <!-- NOMBRE -->
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">
+                                    Nombre
+                                </label>
+
+                                <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-bookmark"></i>
+                                </span>
+
+                                    <input type="text"
+                                           name="nombre"
+                                           class="form-control"
+                                           placeholder="Ingrese nombre categoría" onkeypress="return soloLetras(event)"
+                                           required>
+                                </div>
+                            </div>
+
+                            <!-- DESCRIPCION -->
+                            <div class="col-md-12">
+                                <label class="form-label fw-semibold">
+                                    Descripción
+                                </label>
+
+                                <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="bi bi-card-text"></i>
+                                </span>
+
+                                    <textarea name="descripcion"
+                                              class="form-control"
+                                              rows="4"
+                                              placeholder="Ingrese descripción" oninput="validarSoloLetras(this)"
+                                              required></textarea>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="modal-footer px-4">
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-success">
+                            <i class="bi bi-save"></i>
+                            Guardar
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= MODAL EDITAR ================= -->
+    <div class="modal fade" id="modalEditarCategoria" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content shadow-lg rounded-3">
+
+                <form id="formEditarCategoria">
+
+                    <input type="hidden"
+                           name="idCategoria"
+                           id="edit_idCategoria">
+
+                    <!-- HEADER -->
+                    <div class="modal-header bg-warning text-dark">
+
+                        <h5 class="modal-title">
+                            <i class="bi bi-pencil-square"></i>
+                            Editar Categoría
+                        </h5>
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal">
+                        </button>
+
+                    </div>
+
+                    <!-- BODY -->
+                    <div class="modal-body px-4 py-3">
+
+                        <div class="row g-3">
+
+                            <!-- NOMBRE -->
+                            <div class="col-md-12">
+
+                                <label class="form-label fw-semibold">
+                                    Nombre
+                                </label>
+
+                                <div class="input-group">
+
+                                <span class="input-group-text">
+                                    <i class="bi bi-bookmark"></i>
+                                </span>
+
+                                    <input type="text"
+                                           name="nombre"
+                                           id="edit_nombreCategoria"
+                                           class="form-control"
+                                           required onkeypress="return soloLetras(event)">
+
+                                </div>
+
+                            </div>
+
+                            <!-- DESCRIPCION -->
+                            <div class="col-md-12">
+
+                                <label class="form-label fw-semibold">
+                                    Descripción
+                                </label>
+
+                                <div class="input-group">
+
+                                <span class="input-group-text">
+                                    <i class="bi bi-card-text"></i>
+                                </span>
+
+                                    <textarea name="descripcion"
+                                              id="edit_descripcion"
+                                              class="form-control"
+                                              rows="4"
+                                              required></textarea>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- FOOTER -->
+                    <div class="modal-footer px-4">
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-success">
+                            <i class="bi bi-check-circle"></i>
+                            Actualizar
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+
+</div>
