@@ -171,10 +171,22 @@
             <i class="bi bi-person input-icon"></i>
         </div>
 
-        <div class="input-urbano-group">
-            <input type="password" name="password" class="input-urbano" placeholder="Contraseña" required>
-            <i class="bi bi-lock input-icon"></i>
-        </div>
+       <div class="input-urbano-group">
+    <input type="password" name="password" id="passwordField" class="input-urbano" placeholder="Contraseña" required>
+    <i class="bi bi-eye input-icon" id="togglePassword" style="cursor: pointer;" title="Mostrar contraseña"></i>
+</div>
+
+<script>
+    const togglePassword = document.querySelector('#togglePassword');
+    const passwordField = document.querySelector('#passwordField');
+
+    togglePassword.addEventListener('click', function () {
+        const type = passwordField.type === 'password' ? 'text' : 'password';
+        passwordField.type = type;
+        this.classList.toggle('bi-eye');
+        this.classList.toggle('bi-eye-slash');
+    });
+</script>
 
         <div class="row align-items-center mb-4">
             <div class="col-6">
