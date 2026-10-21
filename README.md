@@ -164,7 +164,7 @@ La configuración de prueba usa los datasources definidos en la aplicación, por
 
 ## Notas de datos
 
-- Hibernate está configurado con `ddl-auto=update`; al iniciar puede crear o actualizar tablas.
-- SQLite se configura mediante `spring.datasource.sqlite.url`; el archivo incluido `bd_logos.db` se usa por defecto.
+- Hibernate está configurado con `ddl-auto=update`, al iniciar puede crear o actualizar tablas.
+- SQLite se configura mediante `spring.datasource.sqlite.url`, el archivo incluido `bd_logos.db` se usa por defecto.
 - El inicializador crea permisos y un rol administrador cuando faltan, y crea un usuario inicial si no existe. Revisa y cambia las credenciales iniciales antes de exponer la aplicación.
 - Las imágenes cargadas se sirven desde la carpeta `img/` del directorio de ejecución.
